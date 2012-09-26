@@ -21,7 +21,7 @@ class Nrs_Settings_Controller extends Admin_Controller
 		$this->template->this_page = 'addons';
 		
 		// Standard Settings View
-		$this->template->content = new View("admin/plugins_settings");
+		$this->template->content = new View("admin/addons/plugin_settings");
 		$this->template->content->title = "NRS Settings";
 		
 		// Settings Form View
@@ -30,7 +30,7 @@ class Nrs_Settings_Controller extends Admin_Controller
 		// setup and initialize form field names
 		$form = array
 	    (
-			'nrs_secret' => ''
+			'nrs_secret' => '',
 			'mqtt_subscriptions' => ''
 	    );
         //  Copy the form as errors, so the errors will be stored with keys
@@ -87,8 +87,7 @@ class Nrs_Settings_Controller extends Admin_Controller
 
 			$form = array
 		    (
-		        'nrs_secret' => $settings->nrs_secret,
-		        'mqtt_subscriptions' => $settings->mqtt_subscriptions
+		        'nrs_secret' => $settings->nrs_secret
 		    );
 		}
 		

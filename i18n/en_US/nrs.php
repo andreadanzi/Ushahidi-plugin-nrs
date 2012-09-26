@@ -18,5 +18,13 @@
 	'view_more'=>'View More',
 	'filters'=>'NRS',
 	'NRS_data' => 'NRS related data',
+	'NRS_mqtt_deployments' => 'NRS MQTT Deployments',
+	'mqtt_topic' => 'Topic',
+	'mqtt_host' => 'Host',
+	'mqtt_port' => 'Port',
+	'mqtt_username' => 'Username',
+	'mqtt_password' => 'password',
+	'mqtt_sub_id' => 'Subscription ID'
+
 	);	
 ?>

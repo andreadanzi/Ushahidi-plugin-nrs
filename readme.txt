@@ -1,5 +1,5 @@
 === About ===
-name: NRS 2012
+name: NRS Natural Risk Sensing
 website: http://naturalrisksens.sourceforge.net/
 description: Receive monitoring data from NRS Gateways 
 version: 1.0

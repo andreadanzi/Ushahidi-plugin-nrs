@@ -52,20 +52,22 @@ class Nrs_Install {
 				PRIMARY KEY (`id`)
 			);
 		");
-		// mqtt_subscription_topic=/environments/+/nodes/+/datastreams/+/datapoints/+/
+		// mqtt_subscription_topic=mosquitto_sub -h <host-name> -u <api-key> -t /v2/environments/+/nodes/+/datastreams/+/datapoints/+/
 		$this->db->query("
 			CREATE TABLE IF NOT EXISTS `".Kohana::config('database.default.table_prefix')."nrs_mqtt_subscription` (
 				id int(11) unsigned NOT NULL AUTO_INCREMENT,
 				mqtt_subscription_name varchar(250) NOT NULL,
+				mqtt_subscription_color varchar(20) DEFAULT 'CC0000',
 				mqtt_subscription_topic varchar(255) NOT NULL, 
 				mqtt_host varchar(255) DEFAULT NULL,
 				mqtt_port varchar(255) DEFAULT NULL,
 				mqtt_subscription_id varchar(250) DEFAULT NULL,
+				mqtt_subscription_active tinyint(4) NOT NULL DEFAULT 1,
 				mqtt_username varchar(255) DEFAULT NULL,
 				mqtt_password varchar(255) DEFAULT NULL,
-				mqtt_will-topic varchar(255) DEFAULT NULL,
-				mqtt_will-payload varchar(255) DEFAULT NULL,
-				mqtt_will-retain tinyint(4) DEFAULT NULL,
+				mqtt_will_topic varchar(255) DEFAULT NULL,
+				mqtt_will_payload text DEFAULT NULL,
+				mqtt_will_retain tinyint(4) DEFAULT NULL,
 				mqtt_qos tinyint(4) DEFAULT '0',
 				PRIMARY KEY (id)
 			);
@@ -74,12 +76,12 @@ class Nrs_Install {
 		$this->db->query("
 			CREATE TABLE IF NOT EXISTS `".Kohana::config('database.default.table_prefix')."nrs_mqtt_message` (
 				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-				mqtt_subscription_id int(11) unsigned NOT NULL,
+				nrs_mqtt_subscription_id int(11) unsigned NOT NULL,
 				mqtt_mid int(11) unsigned NULL,
 				mqtt_topic varchar(250) NULL,
 				mqtt_payloadlen int(11) unsigned NULL,
 				mqtt_payload text NULL,
-				mqtt_os tinyint(4) NULL,
+				mqtt_qos tinyint(4) NULL,
 				mqtt_retain tinyint(4) NULL,
 				mqtt_message_datetime datetime DEFAULT NULL,
 				PRIMARY KEY (id)
