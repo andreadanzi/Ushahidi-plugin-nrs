@@ -2,7 +2,7 @@
 name: NRS Natural Risk Sensing
 website: http://naturalrisksens.sourceforge.net/
 description: Receive monitoring data from NRS Gateways 
-version: 1.0
+version: 1.1
 requires: 2.5
 tested up to: 2.5
 author: Andrea Danzi

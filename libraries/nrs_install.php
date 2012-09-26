@@ -83,7 +83,7 @@ class Nrs_Install {
 				mqtt_payload text NULL,
 				mqtt_qos tinyint(4) NULL,
 				mqtt_retain tinyint(4) NULL,
-				mqtt_message_datetime datetime DEFAULT NULL,
+				mqtt_message_datetime timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				PRIMARY KEY (id)
 			);
 		");
