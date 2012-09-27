@@ -17,6 +17,23 @@
 				<h2>
 					<?php admin::manage_subtabs("nrs"); ?>
 				</h2>
+				
+				<!-- tabs -->
+				<div class="tabs">
+					<!-- tabset -->
+					<ul class="tabset">
+						<li><a href="<?php echo url::site() . 'admin/manage/nrs' ?>" class="active"><?php echo Kohana::lang('nrs.NRS_mqtt_deployments');?></a></li>
+						<li><a href="<?php echo url::site() . 'admin/manage/nrs_mqtt_messages' ?>"><?php echo Kohana::lang('nrs.NRS_mqtt_messages');?></a></li>
+					</ul>
+					
+					<!-- tab -->
+					<div class="tab">
+						<ul>
+							<li><a href="javascript:refreshSubscriptions();"><?php echo Kohana::lang('nrs.NRS_refresh_mqtt_deployments');?></a></li><span id="mqtt_deployments_loading"></span>
+						</ul>
+					</div>
+				</div>
+
 				<?php
 				if ($form_error) {
 				?>
@@ -56,7 +73,7 @@
 								<thead>
 									<tr>
 										<th class="col-1">&nbsp;</th>
-										<th class="col-2"><?php echo Kohana::lang('nrs.NRS_mqtt_deployments');?></th>
+										<th class="col-2"><?php echo Kohana::lang('nrs.NRS_mqtt_client');?></th>
 										<th class="col-3"><?php echo Kohana::lang('ui_main.color');?></th>
 										
 										<th class="col-4"><?php echo Kohana::lang('ui_main.actions');?></th>

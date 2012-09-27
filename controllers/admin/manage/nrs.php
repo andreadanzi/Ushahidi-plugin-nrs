@@ -72,6 +72,7 @@ class Nrs_Controller extends Admin_Controller
 				// Delete Action
 				if ( $post->action == 'd' )
 				{ 
+					ORM::factory('nrs_mqtt_message')->where('nrs_mqtt_subscription_id', $nrs_mqtt_subscription_id)->delete_all();
 					$mqtt_subscription->delete( $nrs_mqtt_subscription_id );
 					$form_saved = TRUE;
 					$form_action = utf8::strtoupper(Kohana::lang('ui_admin.deleted'));

@@ -43,3 +43,12 @@ function mqtt_subscriptionAction ( action, confirmAction, id )
 		$("#mqtt_subscriptionListing").submit();
 	}
 }
+
+// Ajax Refresh MQTT Subscriptions
+function refreshSubscriptions()
+{
+	$('#mqtt_deployments_loading').html('<img src="<?php echo url::file_loc('img')."media/img/loading_g.gif"; ?>">');
+	$("#action").attr("value", 'r');		
+	// Submit Form
+	$("#mqtt_subscriptionListing").submit();
+}
