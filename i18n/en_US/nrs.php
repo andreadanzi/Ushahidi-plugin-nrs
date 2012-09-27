@@ -22,6 +22,8 @@
         'NRS_refresh_mqtt_deployments' => 'Refresh MQTT Deployments',
 	'NRS_mqtt_client' => 'MQTT Client',
 	'NRS_mqtt_messages' => 'MQTT Messages',
+	'NRS_preview_message' => 'Preview message',
+	'NRS_message_details' => 'Message Details',
 	'NRS_mqtt_message' => 'MQTT Message',
 	'mqtt_topic' => 'Topic',
 	'mqtt_host' => 'Host',

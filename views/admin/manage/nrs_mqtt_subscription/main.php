@@ -23,7 +23,7 @@
 					<!-- tabset -->
 					<ul class="tabset">
 						<li><a href="<?php echo url::site() . 'admin/manage/nrs' ?>" class="active"><?php echo Kohana::lang('nrs.NRS_mqtt_deployments');?></a></li>
-						<li><a href="<?php echo url::site() . 'admin/manage/nrs_mqtt_messages' ?>"><?php echo Kohana::lang('nrs.NRS_mqtt_messages');?></a></li>
+						<li><a href="<?php echo url::site() . 'admin/manage/nrs/mqtt_messages' ?>"><?php echo Kohana::lang('nrs.NRS_mqtt_messages');?></a></li>
 					</ul>
 					
 					<!-- tab -->
@@ -110,12 +110,14 @@
 										$mqtt_subscription_id = $nrs_mqtt_subscription->mqtt_subscription_id;
 										$mqtt_username = $nrs_mqtt_subscription->mqtt_username;
 										$mqtt_password = $nrs_mqtt_subscription->mqtt_password;
+										$message_count = ORM::factory('nrs_mqtt_message')->where('nrs_mqtt_subscription_id', $nrs_mqtt_subscription_id)->count_all();
+
 										?>
 										<tr>
 											<td class="col-1">&nbsp;</td>
 											<td class="col-2">
 												<div class="post">
-													<h4><?php echo $mqtt_subscription_name; ?></h4>
+													<h4><?php echo $mqtt_subscription_name; ?>&nbsp;&nbsp;&nbsp;[<a href="<?php echo url::base() . 'admin/manage/nrs/mqtt_messages/'.$nrs_mqtt_subscription_id ?>"><?php echo  "#".$message_count ." ". Kohana::lang('nrs.NRS_mqtt_messages');?></a>]</h4>
 												</div>
 												<ul class="links">
 													<?php

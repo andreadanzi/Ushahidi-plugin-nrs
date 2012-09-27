@@ -163,6 +163,74 @@ class Nrs_Controller extends Admin_Controller
 
 	}
 
+	public function mqtt_messages()
+	{
+		$this->template->content = new View('admin/manage/nrs_mqtt_subscription/mqtt_messages');
+		// Check if the last segment of the URI is numeric and grab it
+		$nrs_mqtt_subscription_id = is_numeric($this->uri->last_segment())
+					? $this->uri->last_segment()
+					: "";
+		
+		// SQL filter
+		$filter = (isset($nrs_mqtt_subscription_id)  AND !empty($nrs_mqtt_subscription_id))
+					? " nrs_mqtt_subscription_id = '" . $nrs_mqtt_subscription_id . "' "
+					: " 1=1";
+
+		$form_error = FALSE;
+		$form_saved = FALSE;
+		$form_action = "";
+
+
+		// Check for form submission
+		if ( $_POST )
+		{
+			$post = Validation::factory($_POST);
+
+			 //	 Add some filters
+			$post->pre_filter('trim', TRUE);
+
+			if( $post->validate() )
+			{
+				$message_id = $this->input->post('nrs_mqtt_message_id');
+
+				ORM::factory('nrs_mqtt_message')->delete($message_id);
+
+				$form_saved = TRUE;
+				$form_action = utf8::strtoupper(Kohana::lang('ui_admin.deleted'));
+			}
+		}
+
+		// Pagination
+		$pagination = new Pagination(array(
+			'query_string' => 'page',
+			'items_per_page' => $this->items_per_page,
+			'total_items' => ORM::factory('nrs_mqtt_message')
+							->where($filter)
+							->count_all()
+		));
+
+		$nrs_mqtt_messages = ORM::factory('nrs_mqtt_message')
+						->where($filter)
+						->orderby('mqtt_message_datetime','desc')
+						->find_all($this->items_per_page, $pagination->sql_offset);
+
+		$this->template->content->nrs_mqtt_messages = $nrs_mqtt_messages;
+		$this->template->content->pagination = $pagination;
+		$this->template->content->form_error = $form_error;
+		$this->template->content->form_saved = $form_saved;
+		$this->template->content->form_action = $form_action;
+
+		// Total Reports
+		$this->template->content->total_items = $pagination->total_items;
+
+		// Javascript Header
+		$this->template->js = new View('admin/manage/nrs_mqtt_subscription/mqtt_messages_js');
+
+
+
+
+	}
+
 	/**
 	 * parse subscription and send messages to database
 	 */
