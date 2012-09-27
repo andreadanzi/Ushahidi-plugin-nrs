@@ -14,17 +14,6 @@ from daemon import runner
 from MqttToNrsClient import MqttToNrsClient
 from MqttToNrsClient import MqttToNrsThread
 
-
-def check_subscription_status(nrs_item_id, queue):
-  mysql_conn = MySQLdb.connect(host=settings.hostname, port=settings.portnumber, user=settings.username,passwd=settings.password,db=settings.database)
-  mysql_cur = mysql_conn.cursor()
-  res = mysql_cur.execute("""SELECT mqtt_subscription_active FROM nrs_mqtt_subscription WHERE id=%d""" % nrs_item_id )
-  row = mysql_cur.fetchone()
-  mysql_conn.close()
-  if( row[0] != 2 ):
-    queue.put(3)
-
-
 class MainNRSApp():
    
     def __init__(self):
@@ -63,11 +52,6 @@ class MainNRSApp():
                 self.mqtt_thread_dict[row[0]] = {'item':dict_item, 'client':client, 'queue':status_q}
                 client.start()
             time.sleep(3)
-	    #for key in self.mqtt_thread_dict.keys():
-            #  nrs_item = self.mqtt_thread_dict[key]['item']
-            #  queue = self.mqtt_thread_dict[key]['queue']
-            #  nrs_item_id = nrs_item['id']
-            #  check_subscription_status(nrs_item_id, queue)
 
 app = MainNRSApp()
 logger = logging.getLogger("MainNRSAppLog")
