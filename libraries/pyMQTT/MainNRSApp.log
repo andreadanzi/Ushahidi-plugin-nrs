@@ -1,0 +1,32 @@
+2012-09-27 16:27:28,889 - MainNRSAppLog - INFO - nrs_mqtt_subscription with id=1 and name='Netserver 1' found
+2012-09-27 16:27:28,891 - MainNRSAppLog - INFO - thread started Netserver 1 - client rockfalldefence.dyndns.org:1883 /nrs/feeds/+/nodes/+/measures/+
+2012-09-27 16:27:28,892 - MainNRSAppLog - INFO - nrs_mqtt_subscription with id=5 and name='Netserver 5' found
+2012-09-27 16:27:28,893 - MainNRSAppLog - INFO - nrs_mqtt_subscription with id=6 and name='Netserver 6' found
+2012-09-27 16:27:28,894 - MainNRSAppLog - INFO - thread started Netserver 5 - client rockfalldefence.dyndns.org:1883 /nrs/feeds/+/nodes/+/config/+
+2012-09-27 16:27:28,895 - MainNRSAppLog - INFO - thread started Netserver 6 - client rockfalldefence.dyndns.org:1883 /nrs/feeds/+/config
+2012-09-27 16:27:29,063 - MainNRSAppLog - INFO - Netserver 1 - msg.topic=/nrs/feeds/1234/nodes/1/measures/ax msg.qos=0 msg.payloadlen=21 msg.retain=1
+2012-09-27 16:27:29,129 - MainNRSAppLog - INFO - Netserver 5 - msg.topic=/nrs/feeds/1235/nodes/1/config/alalal msg.qos=0 msg.payloadlen=22 msg.retain=1
+2012-09-27 16:27:29,129 - MainNRSAppLog - INFO - Netserver 6 - msg.topic=/nrs/feeds/1235/config msg.qos=0 msg.payloadlen=11 msg.retain=1
+2012-09-27 16:27:29,162 - MainNRSAppLog - INFO - Netserver 1 - msg.topic=/nrs/feeds/1235/nodes/1/measures/ax msg.qos=0 msg.payloadlen=6 msg.retain=1
+2012-09-27 16:27:29,194 - MainNRSAppLog - INFO - Netserver 5 - msg.topic=/nrs/feeds/1235/nodes/1/config/ax msg.qos=0 msg.payloadlen=23 msg.retain=1
+2012-09-27 16:27:38,777 - MainNRSAppLog - INFO - Netserver 1 - msg.topic=/nrs/feeds/1235/nodes/1/config/ax msg.qos=0 msg.payloadlen=23 msg.retain=0
+2012-09-27 16:27:38,881 - MainNRSAppLog - INFO - Netserver 5 - msg.topic=/nrs/feeds/1235/nodes/1/config/ax msg.qos=0 msg.payloadlen=23 msg.retain=0
+2012-09-27 16:27:46,986 - MainNRSAppLog - INFO - Netserver 1 - msg.topic=/nrs/feeds/1235/nodes/1/measures/ax msg.qos=0 msg.payloadlen=6 msg.retain=0
+2012-09-27 16:27:52,086 - MainNRSAppLog - INFO - Netserver 6 - msg.topic=/nrs/feeds/1235/config msg.qos=0 msg.payloadlen=11 msg.retain=0
+2012-09-27 16:27:53,666 - MainNRSAppLog - INFO - Netserver 6 - msg.topic=/nrs/feeds/1235/config msg.qos=0 msg.payloadlen=11 msg.retain=0
+2012-09-27 16:27:54,297 - MainNRSAppLog - INFO - Netserver 6 - msg.topic=/nrs/feeds/1235/config msg.qos=0 msg.payloadlen=11 msg.retain=0
+2012-09-27 16:27:55,312 - MainNRSAppLog - INFO - Netserver 1 - msg.topic=/nrs/feeds/1235/nodes/1/config/ax msg.qos=0 msg.payloadlen=23 msg.retain=0
+2012-09-27 16:27:55,337 - MainNRSAppLog - INFO - Netserver 5 - msg.topic=/nrs/feeds/1235/nodes/1/config/ax msg.qos=0 msg.payloadlen=23 msg.retain=0
+2012-09-27 16:27:56,687 - MainNRSAppLog - INFO - Netserver 6 - msg.topic=/nrs/feeds/1235/config msg.qos=0 msg.payloadlen=11 msg.retain=0
+2012-09-27 16:28:37,382 - MainNRSAppLog - INFO - thread Netserver 5 with status=3
+2012-09-27 16:28:46,747 - MainNRSAppLog - INFO - Netserver 6 - msg.topic=/nrs/feeds/1235/config msg.qos=0 msg.payloadlen=11 msg.retain=0
+2012-09-27 16:28:49,744 - MainNRSAppLog - INFO - Netserver 1 - msg.topic=/nrs/feeds/1235/nodes/1/config/ax msg.qos=0 msg.payloadlen=23 msg.retain=0
+2012-09-27 16:28:53,640 - MainNRSAppLog - INFO - Netserver 1 - msg.topic=/nrs/feeds/1235/nodes/1/config/ax msg.qos=0 msg.payloadlen=23 msg.retain=0
+2012-09-27 16:29:04,751 - MainNRSAppLog - INFO - Netserver 1 - msg.topic=/nrs/feeds/1235/nodes/1/measures/ax msg.qos=0 msg.payloadlen=6 msg.retain=0
+2012-09-27 16:29:36,202 - MainNRSAppLog - INFO - Netserver 1 - msg.topic=/nrs/feeds/1235/nodes/1/config/ax msg.qos=0 msg.payloadlen=23 msg.retain=0
+2012-09-27 16:30:01,767 - MainNRSAppLog - INFO - Netserver 1 - msg.topic=/nrs/feeds/1235/nodes/1/config/s msg.qos=0 msg.payloadlen=23 msg.retain=0
+2012-09-27 16:30:33,866 - MainNRSAppLog - INFO - thread Netserver 6 with status=3
+2012-09-27 16:30:54,667 - MainNRSAppLog - INFO - Netserver 1 - msg.topic=/nrs/feeds/1235/nodes/1/config/ax msg.qos=0 msg.payloadlen=23 msg.retain=0
+2012-09-27 16:31:01,052 - MainNRSAppLog - INFO - Netserver 1 - msg.topic=/nrs/feeds/1235/nodes/1/config/ax msg.qos=0 msg.payloadlen=23 msg.retain=0
+2012-09-27 16:31:12,079 - MainNRSAppLog - INFO - Netserver 1 - msg.topic=/nrs/feeds/1235/nodes/1/measures/ax msg.qos=0 msg.payloadlen=6 msg.retain=0
+2012-09-27 16:31:26,094 - MainNRSAppLog - INFO - thread Netserver 1 with status=3
