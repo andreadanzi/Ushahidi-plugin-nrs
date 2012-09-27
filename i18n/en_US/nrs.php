@@ -24,7 +24,10 @@
 	'mqtt_port' => 'Port',
 	'mqtt_username' => 'Username',
 	'mqtt_password' => 'password',
-	'mqtt_sub_id' => 'Subscription ID'
+	'mqtt_sub_id' => 'Subscription ID',
+        'mqtt_client_status_active' => 'Active',
+        'mqtt_client_status_running' => 'Running',
+        'mqtt_client_status_stopped' => 'Stopped'
 
 	);	
 ?>

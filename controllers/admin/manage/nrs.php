@@ -82,7 +82,7 @@ class Nrs_Controller extends Admin_Controller
 				{
 					if($mqtt_subscription->loaded)
 					{
-						$mqtt_subscription->sharing_active = 0;
+						$mqtt_subscription->mqtt_subscription_active = 3;
 						$mqtt_subscription->save();
 						$form_saved = TRUE;
 						$form_action = utf8::strtoupper(Kohana::lang('ui_main.hidden'));
@@ -92,9 +92,10 @@ class Nrs_Controller extends Admin_Controller
 				// Show Action
 				else if ($post->action == 'v')
 				{ 
+
 					if ($mqtt_subscription->loaded)
 					{
-						$mqtt_subscription->sharing_active = 1;
+						$mqtt_subscription->mqtt_subscription_active = 1;
 						$mqtt_subscription->save();
 						$form_saved = TRUE;
 						$form_action = utf8::strtoupper(Kohana::lang('ui_admin.shown'));

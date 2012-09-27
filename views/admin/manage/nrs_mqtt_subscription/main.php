@@ -119,10 +119,10 @@
 												<ul>
 													<li class="none-separator"><a href="#add" onClick="fillFields('<?php echo(rawurlencode($nrs_mqtt_subscription_id)); ?>','<?php echo(rawurlencode($mqtt_subscription_topic)); ?>','<?php echo(rawurlencode($mqtt_subscription_name)); ?>','<?php echo(rawurlencode($mqtt_subscription_color)); ?>','<?php echo(rawurlencode($mqtt_host)); ?>','<?php echo(rawurlencode($mqtt_port)); ?>','<?php echo(rawurlencode($mqtt_username)); ?>','<?php echo(rawurlencode($mqtt_password)); ?>','<?php echo(rawurlencode($mqtt_subscription_id)); ?>')"><?php echo Kohana::lang('ui_main.edit');?></a></li>
 													<li class="none-separator">
-													<?php if($mqtt_subscription_active) {?>
-													<a href="javascript:mqtt_subscriptionAction('h','HIDE',<?php echo rawurlencode($nrs_mqtt_subscription_id);?>)" class="status_yes"><?php echo Kohana::lang('ui_main.visible');?></a>
+													<?php if($mqtt_subscription_active==1 || $mqtt_subscription_active==2) {?>
+													<a href="javascript:mqtt_subscriptionAction('h','STOP',<?php echo rawurlencode($nrs_mqtt_subscription_id);?>)" class="status_yes"><?php echo ($mqtt_subscription_active==2? Kohana::lang('nrs.mqtt_client_status_running') : Kohana::lang('nrs.mqtt_client_status_active') );?></a>
 													<?php } else {?>
-													<a href="javascript:mqtt_subscriptionAction('v','SHOW',<?php echo rawurlencode($nrs_mqtt_subscription_id);?>)" class="status_yes"><?php echo Kohana::lang('ui_main.hidden');?></a>
+													<a href="javascript:mqtt_subscriptionAction('v','ACTIVATE',<?php echo rawurlencode($nrs_mqtt_subscription_id);?>)" class="status_yes"><?php echo  Kohana::lang('nrs.mqtt_client_status_stopped');?></a>
 													<?php } ?>
 													</li>
 <li><a href="javascript:mqtt_subscriptionAction('d','DELETE','<?php echo(rawurlencode($nrs_mqtt_subscription_id)); ?>')" class="del"><?php echo Kohana::lang('ui_main.delete');?></a></li>
