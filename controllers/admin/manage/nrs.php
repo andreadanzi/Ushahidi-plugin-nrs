@@ -282,7 +282,181 @@ class Nrs_Controller extends Admin_Controller
 		}
 	}
 
+	private function _manage_nrs_environment($fields,$mqtt_topic,$nrs_entity_uid) // title;uid;descr;status;location;location_name;posizionamento;esposizione;lat;lon;altezza_slm;url
+	{
+		$nrs_entity_id = 0;
+		$title = $fields[0];
+		$uid = $fields[1];
+		$descr = $fields[2];
+		$status = $fields[3];
+		$location = $fields[4];
+		$location_name = $fields[5];
+		$disposition = $fields[6];
+		$exposure = $fields[7];
+		$lat = $fields[8];
+		$lon = $fields[9];
+		$elevation = $fields[10];
+		$url = $fields[11];
+		// Does this message has a location??
+		$location_id = 0;
+		// STEP 1: SAVE LOCATION
+		if (isset($lat) AND isset($lon) AND !empty($lat) AND !empty($lon))
+		{
+			$location = new Location_Model();
+			$location->location_name = (isset($location_name) AND !empty($location_name)?$location_name: Kohana::lang('ui_admin.unknown'));
+			$location->latitude = $lat;
+			$location->longitude = $lon;
+			$location->location_date = date("Y-m-d H:i:s",time());
+			$location->save();
+			$location_id = $location->id;
+		}
+		// We need to check for existing Environments!!!
+		$nrs_environments = ORM::factory('nrs_environment')->where('environment_uid',$nrs_entity_uid)->find_all();
+		if(count($nrs_environment) > 0 )
+		{
+			foreach( $nrs_environments as $nrs_environment)
+			{
+				$new_entity = new Nrs_environment_Model( $nrs_environment->id);
+				$new_entity->title = $title;
+				$new_entity->environment_uid = $uid;
+				$new_entity->description = $descr;
+				$new_entity->status = intval($status);
+				$new_entity->location_id = $location_id;
+				$new_entity->location_name = (isset($location_name) AND !empty($location_name)?$location_name: Kohana::lang('ui_admin.unknown'));
+				$new_entity->location_disposition = $disposition;
+				$new_entity->location_exposure = $exposure;
+				$new_entity->location_latitude = $lat;
+				$new_entity->location_longitude = $lon;
+				$new_entity->location_elevation = intval($elevation);
+				$new_entity->feed = $url;
+				$nrs_entity_id = $new_entity->save();// NN SONO SICURO CHE RESTITUISCA ID
+			}
+		}
+		else
+		{
+			$new_entity = new Nrs_environment_Model();
+			$new_entity->title = $title;
+			$new_entity->environment_uid = $uid;
+			$new_entity->description = $descr;
+			$new_entity->status = intval($status);
+			$new_entity->location_id = $location_id;
+			$new_entity->location_name = (isset($location_name) AND !empty($location_name)?$location_name: Kohana::lang('ui_admin.unknown'));
+			$new_entity->location_disposition = $disposition;
+			$new_entity->location_exposure = $exposure;
+			$new_entity->location_latitude = $lat;
+			$new_entity->location_longitude = $lon;
+			$new_entity->location_elevation = intval($elevation);
+			$new_entity->feed = $url;
+			$nrs_entity_id = $new_entity->save();// NN SONO SICURO CHE RESTITUISCA ID
+		}	
+		return $nrs_entity_id;	
+	}
+	
+	private function _manage_nrs_node($fields,$mqtt_topic,$nrs_entity_uid) // title;uid;descr;status;posizionamento;esposizione
+	{
+		$nrs_entity_id = 0;
+		$title = $fields[0];
+		$uid = $fields[1];
+		$descr = $fields[2];
+		$status = $fields[3];
+		$disposition = $fields[4];
+		$exposure = $fields[5];
+		// We need to check for existing Nodes!!!
+		$nrs_nodes = ORM::factory('nrs_node')->where('node_uid',$nrs_entity_uid)->find_all();
+		if(count($nrs_nodes) > 0 )
+		{
+			foreach( $nrs_nodes as $nrs_node)
+			{
+				$new_entity = new Nrs_node_Model( $nrs_node->id);
+				$new_entity->title = $title;
+				$new_entity->node_uid = $uid;
+				$new_entity->description = $descr;
+				$new_entity->status = intval($status);
+				$new_entity->node_disposition = $disposition;
+				$new_entity->node_exposure = $exposure;
+				$nrs_entity_id = $new_entity->save(); // NN SONO SICURO CHE RESTITUISCA ID
+			}
+		}
+		else
+		{
+			// AND IN THIS CASE ALSO for the parent nrs_environment_id
+			// parse $mqtt_topic,$nrs_entity_uid for retrieving nrs_environment_uid
+			$new_entity = new Nrs_node_Model();
+			$new_entity->title = $title;
+			$new_entity->node_uid = $uid;
+			$new_entity->description = $descr;
+			$new_entity->status = intval($status);
+			$new_entity->node_disposition = $disposition;
+			$new_entity->node_exposure = $exposure;
+			$nrs_entity_id = $new_entity->save(); // NN SONO SICURO CHE RESTITUISCA ID
+		}	
+		return $nrs_entity_id;
+	}
 
+	private function _manage_nrs_datastream($fields,$mqtt_topic,$nrs_entity_uid) // title;uid;descr;unit_label;unit_type;unit_symbol;current_value;max_value;min_value
+	{
+		$nrs_entity_id = 0;
+		$title = $fields[0];
+		$uid = $fields[1];
+		$descr = $fields[2];
+		$unit_label = $fields[3];
+		$unit_type = $fields[4];
+		$unit_symbol = $fields[5];
+		$current_value = $fields[6];
+		$max_value = $fields[7];
+		$min_value = $fields[8];
+		// We need to check for existing Datatstream!!!
+		$nrs_datastreams = ORM::factory('nrs_datastream')->where('datastream_uid',$nrs_entity_uid)->find_all();
+		if(count($nrs_datastreams) > 0 )
+		{
+			foreach( $nrs_datastreams as $nrs_datastream)
+			{
+				$new_entity = new Nrs_datatstream_Model($nrs_datastream->id);
+				$new_entity->title = $title;
+				$new_entity->datastream_uid = $uid;
+				$new_entity->unit_label = $unit_label;
+				$new_entity->unit_type = $unit_type;
+				$new_entity->unit_symbol = $unit_symbol;
+				$new_entity->current_value = floatval($current_value);
+				$new_entity->max_value = floatval($max_value);
+				$new_entity->min_value = floatval($min_value);
+				$nrs_entity_id = $new_entity->save(); // NN SONO SICURO CHE RESTITUISCA ID
+			}
+		}
+		else
+		{
+			// AND IN THIS CASE ALSO for the parent nrs_node_id
+			// parse $mqtt_topic,$nrs_entity_uid for retrieving nrs_node_uid
+			$new_entity = new Nrs_datatstream_Model();
+			$new_entity->title = $title;
+			$new_entity->datastream_uid = $uid;
+			$new_entity->unit_label = $unit_label;
+			$new_entity->unit_type = $unit_type;
+			$new_entity->unit_symbol = $unit_symbol;
+			$new_entity->current_value = floatval($current_value);
+			$new_entity->max_value = floatval($max_value);
+			$new_entity->min_value = floatval($min_value);
+			$nrs_entity_id = $new_entity->save(); // NN SONO SICURO CHE RESTITUISCA ID
+		}	
+		return $nrs_entity_id;	
+
+	}
+
+	private function _manage_nrs_datapoint($fields,$mqtt_topic,$nrs_entity_uid) // msecs;timestamp;value
+	{
+		$nrs_entity_id = 0;
+		$msecs = $fields[0];
+		$timestamp = $fields[1];
+		$value = $fields[2];
+		$new_entity = new Nrs_datatpoint_Model();
+		// SEARCH FOR nrs_environment_id, nrs_node_id, nrs_datastream_id
+		$new_entity->msecs = intval($msecs);
+		$new_entity->at = DateTime::createFromFormat("Y-m-d\TH:i:s.u\Z",$timestamp);
+		$new_entity->value_at = floatval($value);
+		$nrs_entity_id = $new_entity->save(); // NN SONO SICURO CHE RESTITUISCA ID
+		return $nrs_entity_id;
+	}
+	
 
 
 	/**
@@ -292,155 +466,62 @@ class Nrs_Controller extends Admin_Controller
 	{
 		// Max number of message to keep
 		$max_messages = 1000;
-
-		// Get All nrs_mqtt_subscription From DB nrs_entity_type` >0
-		$nrs_mqtt_messages = ORM::factory('nrs_mqtt_message')->where('nrs_entity_type > 0')->where('mqtt_topic_errors = 0')->find_all();
-		foreach ($nrs_mqtt_messages as $nrs_mqtt_message)
+		$int_type = 1;
+		while ($int_type < 5)
 		{
-			$mqtt_payload = $nrs_mqtt_message->mqtt_payload; // per estrarre le informazioni
-			$mqtt_nrs_action = $nrs_mqtt_message->mqtt_nrs_action; // per capire se aggiungere/salvare o cancellare un record
-			$nrs_entity_uid = $nrs_mqtt_message->nrs_entity_uid; // Per controllare che ci sia anche nel payload
-			$nrs_entity_type = $nrs_mqtt_message->nrs_entity_type; // Per scegliere come fare il parsing
-                        $multiline = explode("\n", $mqtt_payload);  // Nel caso ci siano più righe 
-			foreach ($multiline as $line)
-			{
-		                $fields = explode(";", $line);
-				switch ($nrs_entity_type) {
-				    case 1:  // 1 - Environment 12 colonne =>  title;uid;descr;status;location;location_name;posizionamento;esposizione;lat;lon;altezza_slm;url
-					   if(count($fields)=12 ) {
-						$title = $fields[0];
-						$uid = $fields[1];
-						$descr = $fields[2];
-						$status = $fields[3];
-						$location = $fields[4];
-						$location_name = $fields[5];
-						$posizionamento = $fields[6];
-						$esposizione = $fields[7];
-						$lat = $fields[8];
-						$lon = $fields[9];
-						$altezza_slm = $fields[10];
-						$url = $fields[11];
-					   }	
-					   break;
-				    case 2:  // 2 - Node 6 colonne => title;uid;descr;status;posizionamento;esposizione
-					   if(count($fields)=6 ) {
-						$title = $fields[0];
-						$uid = $fields[1];
-						$descr = $fields[2];
-						$status = $fields[3];
-						$posizionamento = $fields[4];
-						$esposizione = $fields[5];
-					   }	
-					break;
-				    case 3:   // 3 - Datastream 9 colonne => title;uid;descr;unit_label;unit_type;unit_symbol;current_value;max_value;min_value
-						$title = $fields[0];
-						$uid = $fields[1];
-						$descr = $fields[2];
-						$unit_label = $fields[3];
-						$unit_type = $fields[4];
-						$unit_symbol = $fields[5];
-						$current_value = $fields[6];
-						$max_value = $fields[7];
-						$min_value = $fields[8];
-					break;
-				    case 4:   // 4 - Datapoint 3 colonne => msecs;timestamp;value
-						$msecs = $fields[0];
-						$timestamp = $fields[1];
-						$value = $fields[2];
-					break;
-				}
-			}
-				// Qui bisogna eseguire il subscribe
-				// $mqtt = new phpMQTT($nrs_mqtt_subscription->mqtt_host, $nrs_mqtt_subscription->mqtt_port, $nrs_mqtt_subscription->mqtt_subscription_name);
-				/*	
-				$nrs_mqtt_subscription_data =  $nrs_mqtt_subscription->mqtt_subscription_topic ;
+			// Get All nrs_mqtt_message From DB nrs_entity_type` >0
+			$nrs_mqtt_messages = ORM::factory('nrs_mqtt_message')->where('nrs_entity_type',$int_type)->where('mqtt_topic_errors',0)->where('nrs_entity_id',0)->orderby('mqtt_message_datetime', 'ASC')->find_all();
+			foreach ($nrs_mqtt_messages as $nrs_mqtt_message)
+			{	
+				$nrs_entity_id = 0;
+				$mqtt_payload = $nrs_mqtt_message->mqtt_payload; 
+				$mqtt_nrs_action = $nrs_mqtt_message->mqtt_nrs_action; 
+				$nrs_entity_uid = $nrs_mqtt_message->nrs_entity_uid; 
+				$nrs_entity_type = $nrs_mqtt_message->nrs_entity_type; 
+				$mqtt_topic = $nrs_mqtt_message->mqtt_topic;
+				$mqtt_message_datetime = $nrs_mqtt_message->mqtt_message_datetime;
+				// Make sure Payload and Topic are set (at least  )
+				if(isset($mqtt_payload) && !empty($mqtt_payload) && isset($mqtt_topic) && !empty($mqtt_topic)  )
+					// We need to check for duplicates!!!
+					// Maybe combination of Topic + Date and nrs_entity_uid (Heavy on the Server :-( ) TO BE IMPROVED
+					$dupe_count = ORM::factory('nrs_mqtt_message')->where('mqtt_topic',$mqtt_topic)->where('mqtt_message_datetime',date("Y-m-d H:i:s",strtotime($mqtt_message_datetime)))->count_all();
 
-				foreach ($nrs_mqtt_subscription_data->get_items(0,50) as $nrs_mqtt_subscription_data_item)
-				{
-					$title = $nrs_mqtt_subscription_data_item->get_title();
-					$link = $nrs_mqtt_subscription_data_item->get_link();
-					$description = $nrs_mqtt_subscription_data_item->get_description();
-					$date = $nrs_mqtt_subscription_data_item->get_date();
-					$latitude = $nrs_mqtt_subscription_data_item->get_latitude();
-					$longitude = $nrs_mqtt_subscription_data_item->get_longitude();
-
-					// Make Sure Title is Set (Atleast)
-					if (isset($title) AND !empty($title ))
+					$multiline = explode("\n", $mqtt_payload);  
+					foreach ($multiline as $line)
 					{
-						// We need to check for duplicates!!!
-						// Maybe combination of Title + Date? (Kinda Heavy on the Server :-( )
-						$dupe_count = ORM::factory('feed_item')->where('item_title',$title)->where('item_date',date("Y-m-d H:i:s",strtotime($date)))->count_all();
-
-						if ($dupe_count == 0)
-						{
-							// Does this feed have a location??
-							$location_id = 0;
-							// STEP 1: SAVE LOCATION
-							if ($latitude AND $longitude)
-							{
-								$location = new Location_Model();
-								$location->location_name = Kohana::lang('ui_admin.unknown');
-								$location->latitude = $latitude;
-								$location->longitude = $longitude;
-								$location->location_date = date("Y-m-d H:i:s",time());
-								$location->save();
-								$location_id = $location->id;
-							}
-
-							$newitem = new Feed_Item_Model();
-							$newitem->feed_id = $nrs_mqtt_subscription->id;
-							$newitem->location_id = $location_id;
-							$newitem->item_title = $title;
-
-							if (isset($description) AND !empty($description))
-							{
-								$newitem->item_description = $description;
-							}
-							if (isset($link) AND !empty($link))
-							{
-								$newitem->item_link = $link;
-							}
-							if (isset($date) AND !empty($date))
-							{
-								$newitem->item_date = date("Y-m-d H:i:s",strtotime($date));
-							}
-							// Set todays date
-							else
-							{
-								$newitem->item_date = date("Y-m-d H:i:s",time());
-							}
-
-							if (isset($feed_type) AND ! empty($feed_type))
-							{
-								$newitem->feed_type = $feed_type;
-							}
-
-							$newitem->save();
+						$fields = explode(";", $line);
+						switch ($nrs_entity_type) {
+						    case 1:  // 1 - Environment 12 columns
+							   if(count($fields) == 12 ) {
+								$nrs_entity_id = $this->_manage_nrs_environment($fields,$mqtt_topic,$nrs_entity_uid);
+							   }	
+							   break;
+						    case 2:  // 2 - Node 6 columns
+							   if(count($fields) == 6 ) {
+								$nrs_entity_id = $this->_manage_nrs_node($fields,$mqtt_topic,$nrs_entity_uid);
+							   }	
+							break;
+						    case 3:   // 3 - Datastream 9 columns 
+							   if(count($fields) == 9 ) {
+								$nrs_entity_id = $this->_manage_nrs_datastream($fields,$mqtt_topic,$nrs_entity_uid);
+							    }
+							break;
+						    case 4:   // 4 - Datapoint 3 columns
+							   if(count($fields) == 3 ) {
+								$nrs_entity_id = $this->_manage_nrs_datapoint($fields,$mqtt_topic,$nrs_entity_uid);
+							    }
+							break;
 						}
-					}
+					} // END FOR EACH MULTILINE
 				}
-
-				// Get Feed Item Count
-				$nrs_mqtt_subscription_count = ORM::factory('feed_item')->where('feed_id', $nrs_mqtt_subscription->id)->count_all();
-				if ($nrs_mqtt_subscription_count > $max_messages)
-				{
-					// Excess Feeds
-					$nrs_mqtt_subscription_excess = $nrs_mqtt_subscription_count - $max_messages;
-
-					// Delete Excess Feeds
-					foreach (ORM::factory('feed_item')
-										->where('feed_id', $nrs_mqtt_subscription->id)
-										->orderby('id', 'ASC')
-										->limit($nrs_mqtt_subscription_excess)
-										->find_all() as $del_feed)
-					{
-						$del_feed->delete($del_feed->id);
-					}
-				}
-
-				$nrs_mqtt_subscription->save();*/
+				// Qui bisogna fare l'associazione con entity_id che è stato inserito
+				// nrs_entity_id
+				$nrs_mqtt_message->nrs_entity_id = $nrs_entity_id;
+				$nrs_mqtt_message->save();
 			
-		}
+			} // END FOR EACH MESSAGE
+			$int_type++;
+		} // END WHILE
 	}
 
 }

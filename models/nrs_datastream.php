@@ -15,7 +15,13 @@
 
 class Nrs_datatstream_Model extends ORM
 {
-	
+	/**
+	 * One-to-many relationship definition
+	 * @var array
+	 */
+	protected $has_many = array('nrs_datapoint');
+
+	protected $belongs_to = array('nrs_node');
 	// Database table name
-	protected $table_name = 'nrs_datatstream';
+	protected $table_name = 'nrs_datastream';
 }

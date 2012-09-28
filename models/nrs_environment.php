@@ -15,7 +15,13 @@
 
 class Nrs_environment_Model extends ORM
 {
-	
+	/**
+	 * One-to-many relationship definition
+	 * @var array
+	 */
+	protected $has_many = array('nrs_node');
+	protected $has_many = array('nrs_datapoint');
+
 	// Database table name
 	protected $table_name = 'nrs_environment';
 }
