@@ -92,12 +92,16 @@
 									$message_title = $message->mqtt_topic;
 									$message_description = $message->mqtt_payload;
 									$message_link = $message->nrs_mqtt_subscription->mqtt_subscription_topic;
-									$message_date = date('Y-m-d', strtotime($message->mqtt_message_datetime));
-									
+									$message_date = date('Y-m-d H:i:s', strtotime($message->mqtt_message_datetime));
+
 									$mqtt_subscription_name = $message->nrs_mqtt_subscription->mqtt_subscription_name;
 									
 									$location_id = 0;// da completare $message->location_id;
-									$incident_id = 0;// da completare $message->incident_id;
+									$nrs_entity_id = $message->nrs_entity_id;
+									$nrs_entity_type = $message->nrs_entity_type;
+									$mqtt_topic_errors = $message->mqtt_topic_errors;
+									$mqtt_nrs_action = $message->mqtt_nrs_action;
+									$nrs_entity_uid = $message->nrs_entity_uid;
 									?>
 									<tr>
 										<td class="col-1"><input name="nrs_mqtt_message_id[]" value="<?php echo $message_id; ?>" type="checkbox" class="check-box"/></td>
@@ -110,21 +114,26 @@
 												</div>
 											</div>
 											<ul class="info">
-												<li class="none-separator"><?php echo Kohana::lang('nrs.NRS_mqtt_client');?>: <strong><a href="<?php echo $message_link; ?>"><?php echo $mqtt_subscription_name; ?></a></strong>
+												<li class="none-separator"><?php echo Kohana::lang('nrs.NRS_mqtt_client');?>: <strong><?php echo $mqtt_subscription_name; ?></strong>
 												<li><?php echo Kohana::lang('ui_main.geolocation_available');?>?: <strong><?php echo ($location_id) ? utf8::strtoupper(Kohana::lang('ui_main.yes')) : utf8::strtoupper(Kohana::lang('ui_main.no'));?></strong></li>
+                        <li><?php echo Kohana::lang('nrs.NRS_mqtt_errors');?>:<strong><?php echo ($mqtt_topic_errors) ? utf8::strtoupper(Kohana::lang('ui_main.yes')) : utf8::strtoupper(Kohana::lang('ui_main.no'));?></strong></li>
 											</ul>
 										</td>
 										<td class="col-3"><?php echo $message_date; ?></td>
 										<td class="col-4">
 											<ul>
 												<?php
-												if ($incident_id != 0) {
-													echo "<li class=\"none-separator\"><a href=\"". url::base() . 'admin/reports/edit/' . $incident_id ."\" class=\"status_yes\"><strong>".Kohana::lang('ui_main.view_report')."</strong></a></li>";
+												if ($nrs_entity_id != 0) {
+													echo "<li class=\"none-separator\"><a href=\"". url::base() . 'admin/manage/nrs/edit_nrs_entity?nrs_type='.$nrs_entity_type.'&amp;nrs_id=' . $nrs_entity_id ."\" class=\"status_yes\"><strong>".Kohana::lang('nrs.view_entity')."</strong></a></li>";
 												}
-												else
+												elseif ($nrs_entity_type>0)
 												{
-													echo "<li class=\"none-separator\"><a href=\"".url::base().'admin/reports/edit?fid='.$message_id."\">".Kohana::lang('ui_main.create_report')."?</a></li>";
+													echo "<li class=\"none-separator\"><a href=\"".url::base().'admin/manage/nrs/edit_nrs_entity?mqtt_mid='.$message_id."\">".Kohana::lang('nrs.create_entity')."</a></li>";
 												}
+                        else
+                        {
+													echo "<li class=\"none-separator\"><strong>".Kohana::lang('nrs.unable_create_entity')."</strong></li>";
+                        }
 												?>
 											<li><a href="javascript:messageAction('d','DELETE','<?php echo(rawurlencode($message_id)); ?>');"><?php echo utf8::strtoupper(Kohana::lang('ui_main.delete'));?></a></li>
 											</ul>

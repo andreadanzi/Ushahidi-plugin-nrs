@@ -84,6 +84,11 @@ class Nrs_Install {
 				mqtt_qos tinyint(4) NULL,
 				mqtt_retain tinyint(4) NULL,
 				mqtt_message_datetime timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+				nrs_entity_type tinyint(4) NOT NULL default '0' COMMENT '0 - NONE, 1 - ENVIRONMENT, 2 - NODE, 3 - DATASTREAM, 4 - DATAPOINT, -1 OTHER',
+				nrs_entity_id int(11) unsigned NOT NULL DEFAULT 0,
+				mqtt_topic_errors tinyint(4) NOT NULL DEFAULT 0,
+				mqtt_nrs_action varchar(4) DEFAULT NULL,
+				nrs_entity_uid varchar(32) DEFAULT NULL,
 				PRIMARY KEY (id)
 			);
 		");

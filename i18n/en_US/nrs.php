@@ -31,9 +31,13 @@
 	'mqtt_username' => 'Username',
 	'mqtt_password' => 'password',
 	'mqtt_sub_id' => 'Subscription ID',
+  'unable_create_entity' => 'NA - Errors',
+  'NRS_mqtt_errors' => 'Errors processing the message',
         'mqtt_client_status_active' => 'Active',
         'mqtt_client_status_running' => 'Running',
-        'mqtt_client_status_stopped' => 'Stopped'
+        'mqtt_client_status_stopped' => 'Stopped',
+        'create_entity' => 'Create Entity',
+        'view_entity' => 'View Entity',
 
 	);	
 ?>

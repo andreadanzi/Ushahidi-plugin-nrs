@@ -11,7 +11,6 @@ import settings
 
 #third party libs
 from daemon import runner
-from MqttToNrsClient import MqttToNrsClient
 from MqttToNrsClient import MqttToNrsThread
 
 class MainNRSApp():

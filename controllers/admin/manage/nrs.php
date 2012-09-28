@@ -231,6 +231,60 @@ class Nrs_Controller extends Admin_Controller
 
 	}
 
+
+	/**
+	 * Edit an entity
+	 * @param bool|int $id The id no. of the report
+	 * @param bool|string $saved
+	 */
+	public function edit_nrs_entity($id = FALSE, $saved = FALSE)
+	{
+		// Are we creating this Entity from a MQTT Message?
+		if ( isset($_GET['mqtt_mid']) AND intval($_GET['mqtt_mid']) > 0 )
+		{
+			$mqtt_message_id = intval($_GET['mqtt_mid']);
+			$mqtt_message = ORM::factory('nrs_mqtt_message', $mqtt_message_id);
+
+			if ($mqtt_message->loaded)
+			{
+				// Has a report already been created for this Feed item?
+				if ($mqtt_message->nrs_entity_id != 0)
+				{
+					// Redirect to entity $mqtt_message->nrs_entity_id $mqtt_message->nrs_entity_type
+					url::redirect('admin/manage/nrs/<NRSTYPE>/edit'. $mqtt_message->nrs_entity_id);
+				}
+				// FILLE THE FORM OF THE SPECIFIED ENTITY
+				/*
+				$form['incident_title'] = $mqtt_message->item_title;
+				$form['incident_description'] = $mqtt_message->item_description;
+				$form['incident_date'] = date('m/d/Y', strtotime($mqtt_message->item_date));
+				$form['incident_hour'] = date('h', strtotime($mqtt_message->item_date));
+				$form['incident_minute'] = date('i', strtotime($mqtt_message->item_date));
+				$form['incident_ampm'] = date('a', strtotime($mqtt_message->item_date));
+
+				// News Link
+				$form['incident_news'][0] = $mqtt_message->item_link;
+
+				// Does this newsfeed have a geolocation?
+				if ($mqtt_message->location_id)
+				{
+					$form['location_id'] = $mqtt_message->location_id;
+					$form['latitude'] = $mqtt_message->location->latitude;
+					$form['longitude'] = $mqtt_message->location->longitude;
+					$form['location_name'] = $mqtt_message->location->location_name;
+				}
+				*/
+			}
+			else
+			{
+				$mqtt_message_id = "";
+			}
+		}
+	}
+
+
+
+
 	/**
 	 * parse subscription and send messages to database
 	 */
@@ -239,11 +293,63 @@ class Nrs_Controller extends Admin_Controller
 		// Max number of message to keep
 		$max_messages = 1000;
 
-		// Get All nrs_mqtt_subscription From DB
-		$nrs_mqtt_subscriptions = ORM::factory('nrs_mqtt_subscription')->find_all();
-		foreach ($nrs_mqtt_subscriptions as $nrs_mqtt_subscription)
+		// Get All nrs_mqtt_subscription From DB nrs_entity_type` >0
+		$nrs_mqtt_messages = ORM::factory('nrs_mqtt_message')->where('nrs_entity_type > 0')->where('mqtt_topic_errors = 0')->find_all();
+		foreach ($nrs_mqtt_messages as $nrs_mqtt_message)
 		{
-						
+			$mqtt_payload = $nrs_mqtt_message->mqtt_payload; // per estrarre le informazioni
+			$mqtt_nrs_action = $nrs_mqtt_message->mqtt_nrs_action; // per capire se aggiungere/salvare o cancellare un record
+			$nrs_entity_uid = $nrs_mqtt_message->nrs_entity_uid; // Per controllare che ci sia anche nel payload
+			$nrs_entity_type = $nrs_mqtt_message->nrs_entity_type; // Per scegliere come fare il parsing
+                        $multiline = explode("\n", $mqtt_payload);  // Nel caso ci siano più righe 
+			foreach ($multiline as $line)
+			{
+		                $fields = explode(";", $line);
+				switch ($nrs_entity_type) {
+				    case 1:  // 1 - Environment 12 colonne =>  title;uid;descr;status;location;location_name;posizionamento;esposizione;lat;lon;altezza_slm;url
+					   if(count($fields)=12 ) {
+						$title = $fields[0];
+						$uid = $fields[1];
+						$descr = $fields[2];
+						$status = $fields[3];
+						$location = $fields[4];
+						$location_name = $fields[5];
+						$posizionamento = $fields[6];
+						$esposizione = $fields[7];
+						$lat = $fields[8];
+						$lon = $fields[9];
+						$altezza_slm = $fields[10];
+						$url = $fields[11];
+					   }	
+					   break;
+				    case 2:  // 2 - Node 6 colonne => title;uid;descr;status;posizionamento;esposizione
+					   if(count($fields)=6 ) {
+						$title = $fields[0];
+						$uid = $fields[1];
+						$descr = $fields[2];
+						$status = $fields[3];
+						$posizionamento = $fields[4];
+						$esposizione = $fields[5];
+					   }	
+					break;
+				    case 3:   // 3 - Datastream 9 colonne => title;uid;descr;unit_label;unit_type;unit_symbol;current_value;max_value;min_value
+						$title = $fields[0];
+						$uid = $fields[1];
+						$descr = $fields[2];
+						$unit_label = $fields[3];
+						$unit_type = $fields[4];
+						$unit_symbol = $fields[5];
+						$current_value = $fields[6];
+						$max_value = $fields[7];
+						$min_value = $fields[8];
+					break;
+				    case 4:   // 4 - Datapoint 3 colonne => msecs;timestamp;value
+						$msecs = $fields[0];
+						$timestamp = $fields[1];
+						$value = $fields[2];
+					break;
+				}
+			}
 				// Qui bisogna eseguire il subscribe
 				// $mqtt = new phpMQTT($nrs_mqtt_subscription->mqtt_host, $nrs_mqtt_subscription->mqtt_port, $nrs_mqtt_subscription->mqtt_subscription_name);
 				/*	
