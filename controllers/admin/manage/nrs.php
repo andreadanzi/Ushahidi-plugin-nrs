@@ -312,24 +312,25 @@ class Nrs_Controller extends Admin_Controller
 		}
 		// We need to check for existing Environments!!!
 		$nrs_environments = ORM::factory('nrs_environment')->where('environment_uid',$nrs_entity_uid)->find_all();
-		if(count($nrs_environment) > 0 )
+		if(count($nrs_environments) > 0 )
 		{
 			foreach( $nrs_environments as $nrs_environment)
 			{
-				$new_entity = new Nrs_environment_Model( $nrs_environment->id);
-				$new_entity->title = $title;
-				$new_entity->environment_uid = $uid;
-				$new_entity->description = $descr;
-				$new_entity->status = intval($status);
-				$new_entity->location_id = $location_id;
-				$new_entity->location_name = (isset($location_name) AND !empty($location_name)?$location_name: Kohana::lang('ui_admin.unknown'));
-				$new_entity->location_disposition = $disposition;
-				$new_entity->location_exposure = $exposure;
-				$new_entity->location_latitude = $lat;
-				$new_entity->location_longitude = $lon;
-				$new_entity->location_elevation = intval($elevation);
-				$new_entity->feed = $url;
-				$nrs_entity_id = $new_entity->save();// NN SONO SICURO CHE RESTITUISCA ID
+				$nrs_environment->title = $title;
+				$nrs_environment->environment_uid = $uid;
+				$nrs_environment->description = $descr;
+				$nrs_environment->status = intval($status);
+				$nrs_environment->location_id = $location_id;
+				$nrs_environment->location_name = (isset($location_name) AND !empty($location_name)?$location_name: Kohana::lang('ui_admin.unknown'));
+				$nrs_environment->location_disposition = $disposition;
+				$nrs_environment->location_exposure = $exposure;
+				$nrs_environment->location_latitude = $lat;
+				$nrs_environment->location_longitude = $lon;
+				$nrs_environment->location_elevation = intval($elevation);
+				$nrs_environment->feed = $url;
+				$nrs_environment->updated = date("Y-m-d H:i:s",time());
+				$nrs_entity_id = $nrs_environment->id;
+				$nrs_environment->save();// Check if it retrieves the new id
 			}
 		}
 		else
@@ -347,7 +348,8 @@ class Nrs_Controller extends Admin_Controller
 			$new_entity->location_longitude = $lon;
 			$new_entity->location_elevation = intval($elevation);
 			$new_entity->feed = $url;
-			$nrs_entity_id = $new_entity->save();// NN SONO SICURO CHE RESTITUISCA ID
+			$new_entity->updated = date("Y-m-d H:i:s",time());
+			$nrs_entity_id = $new_entity->save()->id;// Check if it retrieves the new id
 		}	
 		return $nrs_entity_id;	
 	}
@@ -361,34 +363,39 @@ class Nrs_Controller extends Admin_Controller
 		$status = $fields[3];
 		$disposition = $fields[4];
 		$exposure = $fields[5];
+		$topic_splitted = explode("/", $mqtt_topic);
+		$environment_uid = $topic_splitted[4];
 		// We need to check for existing Nodes!!!
-		$nrs_nodes = ORM::factory('nrs_node')->where('node_uid',$nrs_entity_uid)->find_all();
+		$nrs_nodes = ORM::factory('nrs_node')->where('node_uid',$environment_uid.$nrs_entity_uid)->find_all();
 		if(count($nrs_nodes) > 0 )
 		{
 			foreach( $nrs_nodes as $nrs_node)
 			{
-				$new_entity = new Nrs_node_Model( $nrs_node->id);
+				$new_entity = $nrs_node;
 				$new_entity->title = $title;
-				$new_entity->node_uid = $uid;
+				$new_entity->node_uid = $environment_uid.$nrs_entity_uid;
 				$new_entity->description = $descr;
 				$new_entity->status = intval($status);
 				$new_entity->node_disposition = $disposition;
 				$new_entity->node_exposure = $exposure;
-				$nrs_entity_id = $new_entity->save(); // NN SONO SICURO CHE RESTITUISCA ID
+				$nrs_entity_id = $new_entity->id;
+				$new_entity->save(); // Check if it retrieves the new id
 			}
 		}
 		else
 		{
 			// AND IN THIS CASE ALSO for the parent nrs_environment_id
 			// parse $mqtt_topic,$nrs_entity_uid for retrieving nrs_environment_uid
+			$nrs_environment = ORM::factory('nrs_environment')->where('environment_uid',$environment_uid)->find();
 			$new_entity = new Nrs_node_Model();
 			$new_entity->title = $title;
-			$new_entity->node_uid = $uid;
+			$new_entity->node_uid = $environment_uid.$nrs_entity_uid;
 			$new_entity->description = $descr;
 			$new_entity->status = intval($status);
 			$new_entity->node_disposition = $disposition;
 			$new_entity->node_exposure = $exposure;
-			$nrs_entity_id = $new_entity->save(); // NN SONO SICURO CHE RESTITUISCA ID
+			$new_entity->nrs_environment_id = $nrs_environment->id;
+			$nrs_entity_id = $new_entity->save()->id; // Check if it retrieves the new id
 		}	
 		return $nrs_entity_id;
 	}
@@ -405,38 +412,44 @@ class Nrs_Controller extends Admin_Controller
 		$current_value = $fields[6];
 		$max_value = $fields[7];
 		$min_value = $fields[8];
+		$topic_splitted = explode("/", $mqtt_topic);
+		$environment_uid = $topic_splitted[4];
+		$node_uid = $environment_uid.$topic_splitted[6];
 		// We need to check for existing Datatstream!!!
-		$nrs_datastreams = ORM::factory('nrs_datastream')->where('datastream_uid',$nrs_entity_uid)->find_all();
+		$nrs_datastreams = ORM::factory('nrs_datastream')->where('datastream_uid',$node_uid.$nrs_entity_uid)->find_all();
 		if(count($nrs_datastreams) > 0 )
 		{
 			foreach( $nrs_datastreams as $nrs_datastream)
 			{
-				$new_entity = new Nrs_datatstream_Model($nrs_datastream->id);
+				$new_entity = $nrs_datastream;
 				$new_entity->title = $title;
-				$new_entity->datastream_uid = $uid;
+				$new_entity->datastream_uid = $node_uid.$nrs_entity_uid;
 				$new_entity->unit_label = $unit_label;
 				$new_entity->unit_type = $unit_type;
 				$new_entity->unit_symbol = $unit_symbol;
 				$new_entity->current_value = floatval($current_value);
 				$new_entity->max_value = floatval($max_value);
 				$new_entity->min_value = floatval($min_value);
-				$nrs_entity_id = $new_entity->save(); // NN SONO SICURO CHE RESTITUISCA ID
+				$nrs_entity_id = $new_entity->id;
+				$new_entity->save(); // Check if it retrieves the new id
 			}
 		}
 		else
 		{
 			// AND IN THIS CASE ALSO for the parent nrs_node_id
 			// parse $mqtt_topic,$nrs_entity_uid for retrieving nrs_node_uid
+			$nrs_node = ORM::factory('nrs_node')->where('node_uid',$node_uid)->find();
 			$new_entity = new Nrs_datatstream_Model();
 			$new_entity->title = $title;
-			$new_entity->datastream_uid = $uid;
+			$new_entity->datastream_uid = $node_uid.$nrs_entity_uid;
 			$new_entity->unit_label = $unit_label;
 			$new_entity->unit_type = $unit_type;
 			$new_entity->unit_symbol = $unit_symbol;
 			$new_entity->current_value = floatval($current_value);
 			$new_entity->max_value = floatval($max_value);
 			$new_entity->min_value = floatval($min_value);
-			$nrs_entity_id = $new_entity->save(); // NN SONO SICURO CHE RESTITUISCA ID
+			$new_entity->nrs_node_id = $nrs_node->id;
+			$nrs_entity_id = $new_entity->save()->id; // Check if it retrieves the new id
 		}	
 		return $nrs_entity_id;	
 
@@ -449,11 +462,21 @@ class Nrs_Controller extends Admin_Controller
 		$timestamp = $fields[1];
 		$value = $fields[2];
 		$new_entity = new Nrs_datatpoint_Model();
+		$environment_uid = $topic_splitted[4];
+		$node_uid = $environment_uid.$topic_splitted[6];
+		$datastream_uid = $node_uid.$topic_splitted[8];
 		// SEARCH FOR nrs_environment_id, nrs_node_id, nrs_datastream_id
+		$nrs_environment = ORM::factory('nrs_environment')->where('environment_uid',$environment_uid)->find();
+		$nrs_node = ORM::factory('nrs_node')->where('node_uid',$node_uid)->find();
+		$nrs_datastream = ORM::factory('nrs_datastream')->where('datastream_uid',$datastream_uid)->find();
+		// Prepare the item
 		$new_entity->msecs = intval($msecs);
 		$new_entity->at = DateTime::createFromFormat("Y-m-d\TH:i:s.u\Z",$timestamp);
 		$new_entity->value_at = floatval($value);
-		$nrs_entity_id = $new_entity->save(); // NN SONO SICURO CHE RESTITUISCA ID
+		$new_entity->nrs_environment_id = $nrs_environment->id;
+		$new_entity->nrs_node_id = $nrs_node->id;
+		$new_entity->nrs_datastream_id = $nrs_datastream->id;
+		$nrs_entity_id = $new_entity->save()->id; // Check if it retrieves the new id
 		return $nrs_entity_id;
 	}
 	
@@ -482,6 +505,7 @@ class Nrs_Controller extends Admin_Controller
 				$mqtt_message_datetime = $nrs_mqtt_message->mqtt_message_datetime;
 				// Make sure Payload and Topic are set (at least  )
 				if(isset($mqtt_payload) && !empty($mqtt_payload) && isset($mqtt_topic) && !empty($mqtt_topic)  )
+				{
 					// We need to check for duplicates!!!
 					// Maybe combination of Topic + Date and nrs_entity_uid (Heavy on the Server :-( ) TO BE IMPROVED
 					$dupe_count = ORM::factory('nrs_mqtt_message')->where('mqtt_topic',$mqtt_topic)->where('mqtt_message_datetime',date("Y-m-d H:i:s",strtotime($mqtt_message_datetime)))->count_all();
@@ -514,8 +538,7 @@ class Nrs_Controller extends Admin_Controller
 						}
 					} // END FOR EACH MULTILINE
 				}
-				// Qui bisogna fare l'associazione con entity_id che è stato inserito
-				// nrs_entity_id
+				// Associate the new nrs_entity_id
 				$nrs_mqtt_message->nrs_entity_id = $nrs_entity_id;
 				$nrs_mqtt_message->save();
 			
