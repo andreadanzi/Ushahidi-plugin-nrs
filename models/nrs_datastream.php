@@ -13,7 +13,7 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL) 
  */
 
-class Nrs_datatstream_Model extends ORM
+class Nrs_datastream_Model extends ORM
 {
 	/**
 	 * One-to-many relationship definition

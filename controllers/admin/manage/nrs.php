@@ -191,12 +191,21 @@ class Nrs_Controller extends Admin_Controller
 
 			if( $post->validate() )
 			{
+
 				$message_id = $this->input->post('nrs_mqtt_message_id');
+				// Delete Action
+				if ( $post->action == 'd' )
+				{ 
+					ORM::factory('nrs_mqtt_message')->delete($message_id);
+					$form_saved = TRUE;
+					$form_action = utf8::strtoupper(Kohana::lang('ui_admin.deleted'));
+				}
+				else if ( $post->action == 'g') 	// Generate Action
+				{
+					$nrs_mqtt_message = ORM::factory('nrs_mqtt_message',$message_id);
+					$this->_parse_nrs_mqtt_message($nrs_mqtt_message);
+				}
 
-				ORM::factory('nrs_mqtt_message')->delete($message_id);
-
-				$form_saved = TRUE;
-				$form_action = utf8::strtoupper(Kohana::lang('ui_admin.deleted'));
 			}
 		}
 
@@ -226,61 +235,8 @@ class Nrs_Controller extends Admin_Controller
 		// Javascript Header
 		$this->template->js = new View('admin/manage/nrs_mqtt_subscription/mqtt_messages_js');
 
-
-
-
 	}
 
-
-	/**
-	 * Edit an entity
-	 * @param bool|int $id The id no. of the report
-	 * @param bool|string $saved
-	 */
-	public function edit_nrs_entity($id = FALSE, $saved = FALSE)
-	{
-		// Are we creating this Entity from a MQTT Message?
-		if ( isset($_GET['mqtt_mid']) AND intval($_GET['mqtt_mid']) > 0 )
-		{
-			$mqtt_message_id = intval($_GET['mqtt_mid']);
-			$mqtt_message = ORM::factory('nrs_mqtt_message', $mqtt_message_id);
-
-			if ($mqtt_message->loaded)
-			{
-				// Has a report already been created for this Feed item?
-				if ($mqtt_message->nrs_entity_id != 0)
-				{
-					// Redirect to entity $mqtt_message->nrs_entity_id $mqtt_message->nrs_entity_type
-					url::redirect('admin/manage/nrs/<NRSTYPE>/edit'. $mqtt_message->nrs_entity_id);
-				}
-				// FILLE THE FORM OF THE SPECIFIED ENTITY
-				/*
-				$form['incident_title'] = $mqtt_message->item_title;
-				$form['incident_description'] = $mqtt_message->item_description;
-				$form['incident_date'] = date('m/d/Y', strtotime($mqtt_message->item_date));
-				$form['incident_hour'] = date('h', strtotime($mqtt_message->item_date));
-				$form['incident_minute'] = date('i', strtotime($mqtt_message->item_date));
-				$form['incident_ampm'] = date('a', strtotime($mqtt_message->item_date));
-
-				// News Link
-				$form['incident_news'][0] = $mqtt_message->item_link;
-
-				// Does this newsfeed have a geolocation?
-				if ($mqtt_message->location_id)
-				{
-					$form['location_id'] = $mqtt_message->location_id;
-					$form['latitude'] = $mqtt_message->location->latitude;
-					$form['longitude'] = $mqtt_message->location->longitude;
-					$form['location_name'] = $mqtt_message->location->location_name;
-				}
-				*/
-			}
-			else
-			{
-				$mqtt_message_id = "";
-			}
-		}
-	}
 
 	private function _manage_nrs_environment($fields,$mqtt_topic,$nrs_entity_uid) // title;uid;descr;status;location;location_name;posizionamento;esposizione;lat;lon;altezza_slm;url
 	{
@@ -379,6 +335,7 @@ class Nrs_Controller extends Admin_Controller
 				$new_entity->node_disposition = $disposition;
 				$new_entity->node_exposure = $exposure;
 				$nrs_entity_id = $new_entity->id;
+				$new_entity->updated = date("Y-m-d H:i:s",time());
 				$new_entity->save(); // Check if it retrieves the new id
 			}
 		}
@@ -395,6 +352,7 @@ class Nrs_Controller extends Admin_Controller
 			$new_entity->node_disposition = $disposition;
 			$new_entity->node_exposure = $exposure;
 			$new_entity->nrs_environment_id = $nrs_environment->id;
+			$new_entity->updated = date("Y-m-d H:i:s",time());
 			$nrs_entity_id = $new_entity->save()->id; // Check if it retrieves the new id
 		}	
 		return $nrs_entity_id;
@@ -431,6 +389,7 @@ class Nrs_Controller extends Admin_Controller
 				$new_entity->max_value = floatval($max_value);
 				$new_entity->min_value = floatval($min_value);
 				$nrs_entity_id = $new_entity->id;
+				$new_entity->updated = date("Y-m-d H:i:s",time());
 				$new_entity->save(); // Check if it retrieves the new id
 			}
 		}
@@ -439,7 +398,7 @@ class Nrs_Controller extends Admin_Controller
 			// AND IN THIS CASE ALSO for the parent nrs_node_id
 			// parse $mqtt_topic,$nrs_entity_uid for retrieving nrs_node_uid
 			$nrs_node = ORM::factory('nrs_node')->where('node_uid',$node_uid)->find();
-			$new_entity = new Nrs_datatstream_Model();
+			$new_entity = new Nrs_datastream_Model();
 			$new_entity->title = $title;
 			$new_entity->datastream_uid = $node_uid.$nrs_entity_uid;
 			$new_entity->unit_label = $unit_label;
@@ -449,6 +408,7 @@ class Nrs_Controller extends Admin_Controller
 			$new_entity->max_value = floatval($max_value);
 			$new_entity->min_value = floatval($min_value);
 			$new_entity->nrs_node_id = $nrs_node->id;
+			$new_entity->updated = date("Y-m-d H:i:s",time());
 			$nrs_entity_id = $new_entity->save()->id; // Check if it retrieves the new id
 		}	
 		return $nrs_entity_id;	
@@ -461,7 +421,8 @@ class Nrs_Controller extends Admin_Controller
 		$msecs = $fields[0];
 		$timestamp = $fields[1];
 		$value = $fields[2];
-		$new_entity = new Nrs_datatpoint_Model();
+		$new_entity = new Nrs_datapoint_Model();
+		$topic_splitted = explode("/", $mqtt_topic);
 		$environment_uid = $topic_splitted[4];
 		$node_uid = $environment_uid.$topic_splitted[6];
 		$datastream_uid = $node_uid.$topic_splitted[8];
@@ -471,7 +432,7 @@ class Nrs_Controller extends Admin_Controller
 		$nrs_datastream = ORM::factory('nrs_datastream')->where('datastream_uid',$datastream_uid)->find();
 		// Prepare the item
 		$new_entity->msecs = intval($msecs);
-		$new_entity->at = DateTime::createFromFormat("Y-m-d\TH:i:s.u\Z",$timestamp);
+		$new_entity->at = DateTime::createFromFormat("Y-m-d\TH:i:s.u\Z",$timestamp); // DA RIVEDERE
 		$new_entity->value_at = floatval($value);
 		$new_entity->nrs_environment_id = $nrs_environment->id;
 		$new_entity->nrs_node_id = $nrs_node->id;
@@ -480,72 +441,91 @@ class Nrs_Controller extends Admin_Controller
 		return $nrs_entity_id;
 	}
 	
-
-
+	
 	/**
 	 * parse subscription and send messages to database
 	 */
-	private function _parse_nrs_mqtt_subscription()
+	private function _parse_nrs_mqtt_subscription($mqtt_mid=null)
 	{
 		// Max number of message to keep
 		$max_messages = 1000;
-		$int_type = 1;
-		while ($int_type < 5)
+		if($mqtt_mid==null || (isset($mqtt_mid) && empty($mqtt_mid)))
 		{
-			// Get All nrs_mqtt_message From DB nrs_entity_type` >0
-			$nrs_mqtt_messages = ORM::factory('nrs_mqtt_message')->where('nrs_entity_type',$int_type)->where('mqtt_topic_errors',0)->where('nrs_entity_id',0)->orderby('mqtt_message_datetime', 'ASC')->find_all();
-			foreach ($nrs_mqtt_messages as $nrs_mqtt_message)
-			{	
-				$nrs_entity_id = 0;
-				$mqtt_payload = $nrs_mqtt_message->mqtt_payload; 
-				$mqtt_nrs_action = $nrs_mqtt_message->mqtt_nrs_action; 
-				$nrs_entity_uid = $nrs_mqtt_message->nrs_entity_uid; 
-				$nrs_entity_type = $nrs_mqtt_message->nrs_entity_type; 
-				$mqtt_topic = $nrs_mqtt_message->mqtt_topic;
-				$mqtt_message_datetime = $nrs_mqtt_message->mqtt_message_datetime;
-				// Make sure Payload and Topic are set (at least  )
-				if(isset($mqtt_payload) && !empty($mqtt_payload) && isset($mqtt_topic) && !empty($mqtt_topic)  )
-				{
-					// We need to check for duplicates!!!
-					// Maybe combination of Topic + Date and nrs_entity_uid (Heavy on the Server :-( ) TO BE IMPROVED
-					$dupe_count = ORM::factory('nrs_mqtt_message')->where('mqtt_topic',$mqtt_topic)->where('mqtt_message_datetime',date("Y-m-d H:i:s",strtotime($mqtt_message_datetime)))->count_all();
-
-					$multiline = explode("\n", $mqtt_payload);  
-					foreach ($multiline as $line)
-					{
-						$fields = explode(";", $line);
-						switch ($nrs_entity_type) {
-						    case 1:  // 1 - Environment 12 columns
-							   if(count($fields) == 12 ) {
-								$nrs_entity_id = $this->_manage_nrs_environment($fields,$mqtt_topic,$nrs_entity_uid);
-							   }	
-							   break;
-						    case 2:  // 2 - Node 6 columns
-							   if(count($fields) == 6 ) {
-								$nrs_entity_id = $this->_manage_nrs_node($fields,$mqtt_topic,$nrs_entity_uid);
-							   }	
-							break;
-						    case 3:   // 3 - Datastream 9 columns 
-							   if(count($fields) == 9 ) {
-								$nrs_entity_id = $this->_manage_nrs_datastream($fields,$mqtt_topic,$nrs_entity_uid);
-							    }
-							break;
-						    case 4:   // 4 - Datapoint 3 columns
-							   if(count($fields) == 3 ) {
-								$nrs_entity_id = $this->_manage_nrs_datapoint($fields,$mqtt_topic,$nrs_entity_uid);
-							    }
-							break;
-						}
-					} // END FOR EACH MULTILINE
-				}
-				// Associate the new nrs_entity_id
-				$nrs_mqtt_message->nrs_entity_id = $nrs_entity_id;
-				$nrs_mqtt_message->save();
+			$int_type = 1;
+			while ($int_type < 5)
+			{
+				// Get All nrs_mqtt_message From DB nrs_entity_type` >0
+				$nrs_mqtt_messages = ORM::factory('nrs_mqtt_message')->where('nrs_entity_type',$int_type)->where('mqtt_topic_errors',0)->where('nrs_entity_id',0)->orderby('mqtt_message_datetime', 'ASC')->find_all();
+				foreach ($nrs_mqtt_messages as $nrs_mqtt_message)
+				{	
+					$this->_parse_nrs_mqtt_message($nrs_mqtt_message);
 			
-			} // END FOR EACH MESSAGE
-			$int_type++;
-		} // END WHILE
+				} // END FOR EACH MESSAGE
+				$int_type++;
+			} // END WHILE
+		}
+		else if (isset($mqtt_mid) && !empty($mqtt_mid) )
+		{
+			$nrs_mqtt_message = ORM::factory('nrs_mqtt_message',$mqtt_mid);
+			$this->_parse_nrs_mqtt_message($nrs_mqtt_message);
+		}
 	}
+
+
+	/**
+	 * parse message item
+	 */
+	private function _parse_nrs_mqtt_message(&$nrs_mqtt_message)
+	{
+		$nrs_entity_id = 0;
+		$mqtt_payload = $nrs_mqtt_message->mqtt_payload; 
+		$mqtt_nrs_action = $nrs_mqtt_message->mqtt_nrs_action; 
+		$nrs_entity_uid = $nrs_mqtt_message->nrs_entity_uid; 
+		$nrs_entity_type = $nrs_mqtt_message->nrs_entity_type; 
+		$mqtt_topic = $nrs_mqtt_message->mqtt_topic;
+		$mqtt_message_datetime = $nrs_mqtt_message->mqtt_message_datetime;
+		// Make sure Payload and Topic are set (at least  )
+		if(isset($mqtt_payload) && !empty($mqtt_payload) && isset($mqtt_topic) && !empty($mqtt_topic)  )
+		{
+			// We need to check for duplicates!!!
+			// Maybe combination of Topic + Date and nrs_entity_uid (Heavy on the Server :-( ) TO BE IMPROVED
+			$dupe_count = ORM::factory('nrs_mqtt_message')->where('mqtt_topic',$mqtt_topic)->where('mqtt_message_datetime',date("Y-m-d H:i:s",strtotime($mqtt_message_datetime)))->count_all();
+
+			$multiline = explode("\n", $mqtt_payload);  
+			foreach ($multiline as $line)
+			{
+				$fields = explode(";", $line);
+				switch ($nrs_entity_type) {
+				    case 1:  // 1 - Environment 12 columns
+					   if(count($fields) == 12 ) {
+						$nrs_entity_id = $this->_manage_nrs_environment($fields,$mqtt_topic,$nrs_entity_uid);
+					   }	
+					   break;
+				    case 2:  // 2 - Node 6 columns
+					   if(count($fields) == 6 ) {
+						$nrs_entity_id = $this->_manage_nrs_node($fields,$mqtt_topic,$nrs_entity_uid);
+					   }	
+					break;
+				    case 3:   // 3 - Datastream 9 columns 
+					   if(count($fields) == 9 ) {
+						$nrs_entity_id = $this->_manage_nrs_datastream($fields,$mqtt_topic,$nrs_entity_uid);
+					    }
+					break;
+				    case 4:   // 4 - Datapoint 3 columns
+					   if(count($fields) == 3 ) {
+						$nrs_entity_id = $this->_manage_nrs_datapoint($fields,$mqtt_topic,$nrs_entity_uid);
+					    }
+					break;
+				}
+			} // END FOR EACH MULTILINE
+		}
+		// Associate the new nrs_entity_id
+		$nrs_mqtt_message->nrs_entity_id = $nrs_entity_id;
+		$nrs_mqtt_message->save();
+	}
+
+
+
 
 }
 

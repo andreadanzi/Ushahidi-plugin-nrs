@@ -93,15 +93,15 @@ class MqttToNrsThread(threading.Thread):
     self.iRun = -1
     self.nrs_item = nrs_item
     self.shutdown = False
-    self.client = mosquitto.Mosquitto(self.nrs_item['name'],clean_session=False, obj=self.iRun)
+    self.client = mosquitto.Mosquitto(self.nrs_item['name'],clean_session=True, obj=self.iRun)
     self.client.on_message = self.on_mqtt_message
     self.client.on_connect = self.on_mqtt_connect
-    self.client.on_disconnect = self.on_mqtt_disconnect
     self.client.connect(self.nrs_item['host'],int(self.nrs_item['port']))
   
   def run(self):
     self.logger.info("thread started %s - client %s:%s %s" % (self.nrs_item['name'],self.nrs_item['host'],self.nrs_item['port'],self.nrs_item['topic']))
     self.set_subscription_status(2)
+    self.client.on_disconnect = self.on_mqtt_disconnect
     try:
       while self.iRun == -1:
         self.client.loop()

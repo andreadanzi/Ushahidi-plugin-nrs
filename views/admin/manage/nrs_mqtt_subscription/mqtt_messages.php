@@ -115,7 +115,7 @@
 											</div>
 											<ul class="info">
 												<li class="none-separator"><?php echo Kohana::lang('nrs.NRS_mqtt_client');?>: <strong><?php echo $mqtt_subscription_name; ?></strong>
-												<li><?php echo Kohana::lang('ui_main.geolocation_available');?>?: <strong><?php echo ($location_id) ? utf8::strtoupper(Kohana::lang('ui_main.yes')) : utf8::strtoupper(Kohana::lang('ui_main.no'));?></strong></li>
+												<!-- <li><?php echo Kohana::lang('ui_main.geolocation_available');?>?: <strong><?php echo ($location_id) ? utf8::strtoupper(Kohana::lang('ui_main.yes')) : utf8::strtoupper(Kohana::lang('ui_main.no'));?></strong></li> -->
                         <li><?php echo Kohana::lang('nrs.NRS_mqtt_errors');?>:<strong><?php echo ($mqtt_topic_errors) ? utf8::strtoupper(Kohana::lang('ui_main.yes')) : utf8::strtoupper(Kohana::lang('ui_main.no'));?></strong></li>
 											</ul>
 										</td>
@@ -128,7 +128,7 @@
 												}
 												elseif ($nrs_entity_type>0)
 												{
-													echo "<li class=\"none-separator\"><a href=\"".url::base().'admin/manage/nrs/edit_nrs_entity?mqtt_mid='.$message_id."\">".Kohana::lang('nrs.create_entity')."</a></li>";
+													echo "<li class=\"none-separator\"><a href=\"javascript:messageAction('g','GENERATE NEW ENTITY','".rawurlencode($message_id)."');\">".Kohana::lang('nrs.create_entity')."</a></li>";
 												}
                         else
                         {

@@ -127,6 +127,7 @@ class Nrs_Install {
 				node_exposure varchar(255) DEFAULT NULL,
 				last_update datetime DEFAULT NULL,
 				risk_level tinyint(4) NOT NULL default '1' COMMENT '1 - NULL, 2 - LOW, 3 - MEDIUM, 4 - HIGHT',
+				updated datetime DEFAULT NULL,
 				PRIMARY KEY (id)
 			);
 		");
@@ -145,6 +146,7 @@ class Nrs_Install {
 				current_value float NOT NULL DEFAULT '0.0',
 				min_value float DEFAULT NULL,
 				max_value float DEFAULT NULL,
+				updated datetime DEFAULT NULL,
 				PRIMARY KEY (id)
 			);
 		");

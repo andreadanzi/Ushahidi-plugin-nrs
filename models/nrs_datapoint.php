@@ -13,7 +13,7 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL) 
  */
 
-class Nrs_datatpoint_Model extends ORM
+class Nrs_datapoint_Model extends ORM
 {
 	protected $belongs_to = array('nrs_environment','nrs_node','nrs_datastream','incident');
 
