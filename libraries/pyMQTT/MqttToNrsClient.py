@@ -20,14 +20,18 @@ def ParseTopic(sTopicString):
       retItem['action'] = 'a'
       retItem['env_uid'] = splitted[4].split('.')[0] # remove .csv
       retItem['entity_uid'] = splitted[4].split('.')[0] # remove .csv
-    elif(iLen==6): # Delete Environment
+    elif(iLen==6): # Delete Environmentor bulk import
       retItem['type'] = 1
       retItem['env_uid'] = splitted[5].split('.')[0] # remove .csv
       retItem['entity_uid'] = splitted[5].split('.')[0] # remove .csv
       if(splitted[iLen-2] == 'delete'):
         retItem['action'] = 'd'
+      elif(splitted[iLen-1] == 'bulk'):
+        retItem['action'] = 'b'
+        retItem['env_uid'] = splitted[4]
+        retItem['entity_uid'] = splitted[4]
       else:
-        raise SyntaxError("Wrong delete env mqtt topic format (%s)" % sTopicString)
+        raise SyntaxError("Wrong delete/bulk env mqtt topic format (%s)" % sTopicString)
     elif(iLen==7): # New Node
       if( splitted[5] != "node" or splitted[iLen-1]=='delete' ):
         raise SyntaxError("Wrong add node mqtt topic format (%s)" % sTopicString)

@@ -17,7 +17,6 @@ class Nrs_datapoint_Model extends ORM
 {
 	protected $belongs_to = array('nrs_environment','nrs_node','nrs_datastream','incident');
 
-	
 	// Database table name
 	protected $table_name = 'nrs_datapoint';
 }

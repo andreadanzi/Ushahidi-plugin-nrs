@@ -237,8 +237,83 @@ class Nrs_Controller extends Admin_Controller
 
 	}
 
+	private function _manage_bulk_nrs_environment($mqtt_topic,$nrs_entity_uid,$mqtt_payload)
+	{
+		$nrs_entity_id = 0;
+		// SEARCH FOR nrs_environment_id, nrs_node_id, nrs_datastream_id
+		$nrs_environment = null;
+		$nrs_node = null;
+		$nrs_datastream = null;
+		$nrs_datastream_uid = "";	
+		$multiline = explode("\n", $mqtt_payload);
+		foreach ($multiline as $line)
+		{	
+			$data = str_getcsv( $line, ";");
+			if(isset($data) && count($data) > 17)
+			{
+				$num = count($data);
+				$current_nrs_environment_uid = $data[0];	
+				$current_nrs_node_uid = $current_nrs_environment_uid . $data[3];	
+				$nrs_environment = ORM::factory('nrs_environment')->where('environment_uid',$current_nrs_environment_uid)->find();
+				if( !isset($nrs_environment) || $nrs_environment->id == 0 )
+				{
+					$nrs_environment = new Nrs_environment_Model();
+					$nrs_environment->title = $data[1];
+					$nrs_environment->environment_uid = $current_nrs_environment_uid;
+					$nrs_environment->description = "Environment with uid=" . $current_nrs_environment_uid;
+					$nrs_environment->status = intval($data[2]);
+					$nrs_environment->save();
+				}
+				$nrs_node = ORM::factory('nrs_node')->where('node_uid',$current_nrs_node_uid)->find();
+				if( !isset($nrs_node) || $nrs_node->id == 0 )
+				{
+					$nrs_node = new Nrs_node_Model();
+					$nrs_node->title = $data[4];
+					$nrs_node->nrs_environment_id = $nrs_environment->id;
+					$nrs_node->node_uid = $current_nrs_node_uid;
+					$nrs_node->description = "Node with uid=" . $current_nrs_node_uid;
+					$nrs_node->status = intval($data[5]);
+					$nrs_node->save();
+				}
+				$sample_no = $data[6];
+				$timestamp = $data[7];
+				$at_datetime = DateTime::createFromFormat("Y-m-d\TH:i:s.u\Z",$timestamp);
+				$s_at_datetime = $at_datetime->format("YmdHisu");
+				$data_stream_no = $data[8];		
+				for ($c=0; $c < $data_stream_no; $c++) 
+				{
+					$current_nrs_datastream_uid = $current_nrs_node_uid . $data[9+2*$c];		
+					if($current_nrs_datastream_uid!=$nrs_datastream_uid)
+					{
+						$nrs_datastream_uid = $current_nrs_datastream_uid;
+						$nrs_datastream = ORM::factory('nrs_datastream')->where('datastream_uid',$current_nrs_datastream_uid)->find();
+						if( !isset($nrs_datastream) || $nrs_datastream->id == 0 )
+						{
+							$nrs_datastream = new Nrs_datastream_Model();
+							$nrs_datastream->title = $data[10+2*$c];
+							$nrs_datastream->datastream_uid = $current_nrs_datastream_uid;
+							$nrs_datastream->nrs_node_id = $nrs_node->id;
+							$nrs_datastream->save();
+						}
+					}
+					$new_entity = new Nrs_datapoint_Model();
+					$new_entity->sample_no = intval($sample_no);
+					$new_entity->datetime_at =  $s_at_datetime;
+					$new_entity->value_at =  floatval($data[15+$c]);
+					$new_entity->nrs_environment_id = $nrs_environment->id;
+					$new_entity->nrs_node_id = $nrs_node->id;
+					$new_entity->nrs_datastream_id = $nrs_datastream->id;
+					$new_entity->updated = date("Y-m-d H:i:s",time());
+					$new_entity->incident_id = 0;
+					$new_entity->save();			
+				}
+			}
+		}
+		if( !isset($nrs_datastream) ) return 0;
+		return $nrs_environment->id;
+	}
 
-	private function _manage_nrs_environment($fields,$mqtt_topic,$nrs_entity_uid) // title;uid;descr;status;location;location_name;posizionamento;esposizione;lat;lon;altezza_slm;url
+	private function _manage_nrs_environment($fields,$mqtt_topic,$nrs_entity_uid)
 	{
 		$nrs_entity_id = 0;
 		$title = $fields[0];
@@ -415,29 +490,47 @@ class Nrs_Controller extends Admin_Controller
 
 	}
 
-	private function _manage_nrs_datapoint($fields,$mqtt_topic,$nrs_entity_uid) // msecs;timestamp;value
+	private function _manage_nrs_datapoint($fields,$mqtt_topic,$nrs_entity_uid)
 	{
 		$nrs_entity_id = 0;
-		$msecs = $fields[0];
+		$sample_no = $fields[0];
 		$timestamp = $fields[1];
 		$value = $fields[2];
-		$new_entity = new Nrs_datapoint_Model();
 		$topic_splitted = explode("/", $mqtt_topic);
 		$environment_uid = $topic_splitted[4];
 		$node_uid = $environment_uid.$topic_splitted[6];
 		$datastream_uid = $node_uid.$topic_splitted[8];
+		$at_datetime = DateTime::createFromFormat("Y-m-d\TH:i:s.u\Z",$timestamp);
+		$s_at_datetime = $at_datetime->format("YmdHisu");
 		// SEARCH FOR nrs_environment_id, nrs_node_id, nrs_datastream_id
 		$nrs_environment = ORM::factory('nrs_environment')->where('environment_uid',$environment_uid)->find();
 		$nrs_node = ORM::factory('nrs_node')->where('node_uid',$node_uid)->find();
 		$nrs_datastream = ORM::factory('nrs_datastream')->where('datastream_uid',$datastream_uid)->find();
-		// Prepare the item
-		$new_entity->msecs = intval($msecs);
-		$new_entity->at = DateTime::createFromFormat("Y-m-d\TH:i:s.u\Z",$timestamp); // DA RIVEDERE
-		$new_entity->value_at = floatval($value);
-		$new_entity->nrs_environment_id = $nrs_environment->id;
-		$new_entity->nrs_node_id = $nrs_node->id;
-		$new_entity->nrs_datastream_id = $nrs_datastream->id;
-		$nrs_entity_id = $new_entity->save()->id; // Check if it retrieves the new id
+		$nrs_datapoints = ORM::factory('nrs_datapoint')->where('nrs_environment_id',$nrs_environment->id)->where('nrs_node_id',$nrs_node->id)->where('nrs_datastream_id',$nrs_datastream->id)->where('sample_no',intval($sample_no))->where('datetime_at',$s_at_datetime)->find_all();
+
+		if(count($nrs_datapoints) > 0 )
+		{
+			foreach( $nrs_datapoints as $nrs_datapoint)
+			{
+				$new_entity = $nrs_datapoint;
+				$new_entity->value_at = floatval($value);
+				$new_entity->updated = date("Y-m-d H:i:s",time());
+				$nrs_entity_id = $new_entity->id;
+				$new_entity->save(); // Check if it retrieves the new id
+			}
+		} else {
+			// Prepare the new item
+			$new_entity = new Nrs_datapoint_Model();
+			$new_entity->sample_no = intval($sample_no);
+			$new_entity->datetime_at =  $s_at_datetime;
+			$new_entity->value_at = floatval($value);
+			$new_entity->nrs_environment_id = $nrs_environment->id;
+			$new_entity->nrs_node_id = $nrs_node->id;
+			$new_entity->nrs_datastream_id = $nrs_datastream->id;
+			$new_entity->updated = date("Y-m-d H:i:s",time());
+			$new_entity->incident_id = 0;
+			$nrs_entity_id = $new_entity->save()->id; // Check if it retrieves the new id
+		}
 		return $nrs_entity_id;
 	}
 	
@@ -490,34 +583,40 @@ class Nrs_Controller extends Admin_Controller
 			// We need to check for duplicates!!!
 			// Maybe combination of Topic + Date and nrs_entity_uid (Heavy on the Server :-( ) TO BE IMPROVED
 			$dupe_count = ORM::factory('nrs_mqtt_message')->where('mqtt_topic',$mqtt_topic)->where('mqtt_message_datetime',date("Y-m-d H:i:s",strtotime($mqtt_message_datetime)))->count_all();
-
-			$multiline = explode("\n", $mqtt_payload);  
-			foreach ($multiline as $line)
+			if ( $mqtt_nrs_action=="b" )
 			{
-				$fields = explode(";", $line);
-				switch ($nrs_entity_type) {
-				    case 1:  // 1 - Environment 12 columns
-					   if(count($fields) == 12 ) {
-						$nrs_entity_id = $this->_manage_nrs_environment($fields,$mqtt_topic,$nrs_entity_uid);
-					   }	
-					   break;
-				    case 2:  // 2 - Node 6 columns
-					   if(count($fields) == 6 ) {
-						$nrs_entity_id = $this->_manage_nrs_node($fields,$mqtt_topic,$nrs_entity_uid);
-					   }	
-					break;
-				    case 3:   // 3 - Datastream 9 columns 
-					   if(count($fields) == 9 ) {
-						$nrs_entity_id = $this->_manage_nrs_datastream($fields,$mqtt_topic,$nrs_entity_uid);
-					    }
-					break;
-				    case 4:   // 4 - Datapoint 3 columns
-					   if(count($fields) == 3 ) {
-						$nrs_entity_id = $this->_manage_nrs_datapoint($fields,$mqtt_topic,$nrs_entity_uid);
-					    }
-					break;
-				}
-			} // END FOR EACH MULTILINE
+				$nrs_entity_id = $this->_manage_bulk_nrs_environment($mqtt_topic,$nrs_entity_uid,$mqtt_payload);
+			}
+			else 
+			{
+				$multiline = explode("\n", $mqtt_payload);  
+				foreach ($multiline as $line)
+				{
+					$fields = explode(";", $line);
+					switch ($nrs_entity_type) {
+					    case 1:  // 1 - Environment 12 columns
+						   if(count($fields) == 12 && $mqtt_nrs_action=="a" ) {
+							$nrs_entity_id = $this->_manage_nrs_environment($fields,$mqtt_topic,$nrs_entity_uid);
+						   } 
+						   break;
+					    case 2:  // 2 - Node 6 columns
+						   if(count($fields) == 6 ) {
+							$nrs_entity_id = $this->_manage_nrs_node($fields,$mqtt_topic,$nrs_entity_uid);
+						   }	
+						break;
+					    case 3:   // 3 - Datastream 9 columns 
+						   if(count($fields) == 9 ) {
+							$nrs_entity_id = $this->_manage_nrs_datastream($fields,$mqtt_topic,$nrs_entity_uid);
+						    }
+						break;
+					    case 4:   // 4 - Datapoint 3 columns
+						   if(count($fields) == 3 ) {
+							$nrs_entity_id = $this->_manage_nrs_datapoint($fields,$mqtt_topic,$nrs_entity_uid);
+						    }
+						break;
+					}
+				} // END FOR EACH MULTILINE
+			}
 		}
 		// Associate the new nrs_entity_id
 		$nrs_mqtt_message->nrs_entity_id = $nrs_entity_id;

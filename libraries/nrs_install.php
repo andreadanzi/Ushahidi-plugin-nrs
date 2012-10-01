@@ -158,13 +158,14 @@ class Nrs_Install {
 				nrs_node_id int(11)  NOT NULL DEFAULT '0',
 				nrs_datastream_id int(11)  NOT NULL DEFAULT '0',
 				incident_id int(11) NOT NULL DEFAULT '0',
-				tstamp timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-				at datetime NOT NULL,
-				msecs int(11) NOT NULL DEFAULT '0',
+				updated datetime DEFAULT NULL,
+				datetime_at varchar(30) NOT NULL DEFAULT '0000-00-00 00:00:00.000000',
+				sample_no int(11) NOT NULL DEFAULT '0',
 				value_at float NOT NULL,
 				PRIMARY KEY (id)
 			);
 		");
+
 	}
 
 	/**
