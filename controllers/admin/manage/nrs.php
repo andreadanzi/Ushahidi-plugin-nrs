@@ -237,6 +237,171 @@ class Nrs_Controller extends Admin_Controller
 
 	}
 
+	private function _manage_bulk_json_nrs_environment($mqtt_topic,$nrs_entity_uid,$json_mqtt_payload)
+	{
+		$nrs_entity_id = 0;
+		$dec_environment = json_decode($json_mqtt_payload);
+		$updated_date = date("Y-m-d H:i:s",time());
+		if( isset($dec_environment) )
+		{
+			$current_nrs_environment_uid = $dec_environment->environment_uid;	
+			$nrs_environment = ORM::factory('nrs_environment')->where('environment_uid',$current_nrs_environment_uid)->find();
+			if( !isset($nrs_environment) || $nrs_environment->id == 0 )
+			{
+				$nrs_environment = new Nrs_environment_Model();
+			}
+			$nrs_environment->title = $dec_environment->title;
+			$nrs_environment->environment_uid = $current_nrs_environment_uid;
+			if(isset($dec_environment->description))
+			{
+				$nrs_environment->description = $dec_environment->description;
+			}
+			if(isset($dec_environment->location_name))
+			{
+				$nrs_environment->location_name = $dec_environment->location_name;
+			}
+			if(isset($dec_environment->location_exposure))
+			{
+				$nrs_environment->location_exposure = $dec_environment->location_exposure;
+			}
+			if(isset($dec_environment->location_latitude))
+			{
+				$nrs_environment->location_latitude = $dec_environment->location_latitude;
+			}
+			if(isset($dec_environment->location_longitude))
+			{
+				$nrs_environment->location_longitude = $dec_environment->location_longitude;
+			}
+			if(isset($dec_environment->location_elevation))
+			{
+				$nrs_environment->location_elevation = $dec_environment->location_elevation;
+			}
+
+			$location_id = 0;
+			// SAVE LOCATION IF LON AND LAT are Set
+			if (isset($nrs_environment->location_latitude) AND isset($nrs_environment->location_longitude) AND !empty($nrs_environment->location_latitude) AND !empty($nrs_environment->location_longitude))
+			{
+				$location =  ORM::factory('location')->where('latitude',$nrs_environment->location_latitude)->where('longitude',$nrs_environment->location_longitude)->find();
+				if( !isset($location) || $location->id == 0 ) {
+					$location = new Location_Model();
+					$location->location_name = (isset($dec_environment->location_name) AND !empty($dec_environment->location_name)) ? $dec_environment->location_name : Kohana::lang('ui_admin.unknown');
+				}
+				$location->latitude = $nrs_environment->location_latitude;
+				$location->longitude = $nrs_environment->location_longitude;
+				$location->location_date = $updated_date;
+				$location->save();
+				$nrs_environment->location_id = $location->id;
+			}
+
+			$nrs_environment->status = $nrs_environment->status;
+			if( isset($dec_environment->nodes) && count($dec_environment->nodes)>0)
+			{
+				foreach( $dec_environment->nodes as $node )
+				{
+					$current_nrs_node_uid = $current_nrs_environment_uid . $node->node_uid;
+
+					$nrs_node = ORM::factory('nrs_node')->where('node_uid',$current_nrs_node_uid)->find();
+					if( !isset($nrs_node) || $nrs_node->id == 0 )
+					{
+						$nrs_node = new Nrs_node_Model();
+					}
+					$nrs_node->title = $node->title;
+					$nrs_node->nrs_environment_id = $nrs_environment->id;
+					$nrs_node->node_uid = $current_nrs_node_uid;
+					if(isset($node->description))
+					{
+						$nrs_node->description = $node->description;
+					}
+
+					if(isset($node->node_disposition))
+					{
+						$nrs_node->node_disposition = $node->node_disposition;
+					}
+					if(isset($node->node_exposure))
+					{
+						$nrs_node->node_exposure = $node->node_exposure;
+					}
+					$nrs_node->status = $node->status;
+					if( isset($node->datastreams) && count($node->datastreams)>0)
+					{
+						foreach( $node->datastreams as $datastream )
+						{
+							$current_nrs_datastream_uid = $current_nrs_node_uid . $datastream->datastream_uid;
+							$nrs_datastream = ORM::factory('nrs_datastream')->where('datastream_uid',$current_nrs_datastream_uid)->find();
+							if( !isset($nrs_datastream) || $nrs_datastream->id == 0 )
+							{
+								$nrs_datastream = new Nrs_datastream_Model();
+							}
+							$nrs_datastream->title =$datastream->title;
+							$nrs_datastream->datastream_uid = $current_nrs_datastream_uid;
+							$nrs_datastream->nrs_node_id = $nrs_node->id;
+
+							if(isset($datastream->unit_label))
+							{
+								$nrs_datastream->unit_label = $datastream->unit_label;
+							}
+							if(isset($datastream->unit_type))
+							{
+								$nrs_datastream->unit_type = $datastream->unit_type;
+							}
+							if(isset($datastream->unit_symbol))
+							{
+								$nrs_datastream->unit_symbol = $datastream->unit_symbol;
+							}
+							if(isset($datastream->unit_format))
+							{
+								$nrs_datastream->unit_format = $datastream->unit_format;
+							}
+							if(isset($datastream->tags))
+							{
+								$nrs_datastream->tags = $datastream->tags;
+							}
+							if(isset($datastream->current_value))
+							{
+								$nrs_datastream->current_value =  $datastream->current_value;
+							}
+							if(isset($datastream->min_value))
+							{
+								$nrs_datastream->min_value =  $datastream->min_value;
+							}
+							if(isset($datastream->max_value))
+							{
+								$nrs_datastream->max_value =  $datastream->max_value;
+							}
+
+							if( isset($datastream->datapoints) && count($datastream->datapoints)>0)
+							{
+								foreach( $datastream->datapoints as $datapoint )
+								{
+									$new_entity = new Nrs_datapoint_Model();
+									$new_entity->sample_no = $datapoint->sample_no;
+									$at_datetime = DateTime::createFromFormat("Y-m-d\TH:i:s.u\Z",$datapoint->at);
+									$new_entity->datetime_at = $at_datetime->format("YmdHisu");
+									$new_entity->value_at =  $datapoint->value;
+									$new_entity->nrs_environment_id = $nrs_environment->id;
+									$new_entity->nrs_node_id = $nrs_node->id;
+									$new_entity->nrs_datastream_id = $nrs_datastream->id;
+									$new_entity->updated = $updated_date;
+									$new_entity->incident_id = 0;
+									$new_entity->save();	
+								}
+							}
+							$nrs_datastream->updated = $updated_date;
+							$nrs_datastream->save();
+						}
+					}
+					$nrs_node->updated = $updated_date;
+					$nrs_node->save();
+				}
+			}		
+			$nrs_environment->updated = $updated_date;	
+			$nrs_environment->save();
+			$nrs_entity_id = $nrs_environment->id;
+		}
+		return $nrs_entity_id;
+	}
+
+
 	private function _manage_bulk_nrs_environment($mqtt_topic,$nrs_entity_uid,$mqtt_payload)
 	{
 		$nrs_entity_id = 0;
@@ -245,6 +410,7 @@ class Nrs_Controller extends Admin_Controller
 		$nrs_node = null;
 		$nrs_datastream = null;
 		$nrs_datastream_uid = "";	
+		$updated_date = date("Y-m-d H:i:s",time());
 		$multiline = explode("\n", $mqtt_payload);
 		foreach ($multiline as $line)
 		{	
@@ -262,6 +428,7 @@ class Nrs_Controller extends Admin_Controller
 					$nrs_environment->environment_uid = $current_nrs_environment_uid;
 					$nrs_environment->description = "Environment with uid=" . $current_nrs_environment_uid;
 					$nrs_environment->status = intval($data[2]);
+					$nrs_environment->updated = $updated_date;
 					$nrs_environment->save();
 				}
 				$nrs_node = ORM::factory('nrs_node')->where('node_uid',$current_nrs_node_uid)->find();
@@ -273,6 +440,7 @@ class Nrs_Controller extends Admin_Controller
 					$nrs_node->node_uid = $current_nrs_node_uid;
 					$nrs_node->description = "Node with uid=" . $current_nrs_node_uid;
 					$nrs_node->status = intval($data[5]);
+					$nrs_node->updated = $updated_date;
 					$nrs_node->save();
 				}
 				$sample_no = $data[6];
@@ -293,6 +461,7 @@ class Nrs_Controller extends Admin_Controller
 							$nrs_datastream->title = $data[10+2*$c];
 							$nrs_datastream->datastream_uid = $current_nrs_datastream_uid;
 							$nrs_datastream->nrs_node_id = $nrs_node->id;
+							$nrs_datastream->updated = $updated_date;
 							$nrs_datastream->save();
 						}
 					}
@@ -303,7 +472,7 @@ class Nrs_Controller extends Admin_Controller
 					$new_entity->nrs_environment_id = $nrs_environment->id;
 					$new_entity->nrs_node_id = $nrs_node->id;
 					$new_entity->nrs_datastream_id = $nrs_datastream->id;
-					$new_entity->updated = date("Y-m-d H:i:s",time());
+					$new_entity->updated = $updated_date;
 					$new_entity->incident_id = 0;
 					$new_entity->save();			
 				}
@@ -333,8 +502,11 @@ class Nrs_Controller extends Admin_Controller
 		// STEP 1: SAVE LOCATION
 		if (isset($lat) AND isset($lon) AND !empty($lat) AND !empty($lon))
 		{
-			$location = new Location_Model();
-			$location->location_name = (isset($location_name) AND !empty($location_name)?$location_name: Kohana::lang('ui_admin.unknown'));
+			$location =  ORM::factory('location')->where('latitude',$lat)->where('longitude',$lon)->find();
+			if(!isset($location) || $location->id == 0) {
+				$location = new Location_Model();
+				$location->location_name = (isset($location_name) AND !empty($location_name)) ?$location_name: Kohana::lang('ui_admin.unknown');
+			}
 			$location->latitude = $lat;
 			$location->longitude = $lon;
 			$location->location_date = date("Y-m-d H:i:s",time());
@@ -585,7 +757,15 @@ class Nrs_Controller extends Admin_Controller
 			$dupe_count = ORM::factory('nrs_mqtt_message')->where('mqtt_topic',$mqtt_topic)->where('mqtt_message_datetime',date("Y-m-d H:i:s",strtotime($mqtt_message_datetime)))->count_all();
 			if ( $mqtt_nrs_action=="b" )
 			{
-				$nrs_entity_id = $this->_manage_bulk_nrs_environment($mqtt_topic,$nrs_entity_uid,$mqtt_payload);
+				$json_enc = json_decode($mqtt_payload);
+				if(isset($json_enc))
+				{
+					$nrs_entity_id = $this->_manage_bulk_json_nrs_environment($mqtt_topic,$nrs_entity_uid,$mqtt_payload);
+				}
+				else
+				{
+					$nrs_entity_id = $this->_manage_bulk_nrs_environment($mqtt_topic,$nrs_entity_uid,$mqtt_payload);
+				}
 			}
 			else 
 			{
