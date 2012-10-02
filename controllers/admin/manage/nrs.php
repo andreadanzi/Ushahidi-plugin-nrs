@@ -237,6 +237,7 @@ class Nrs_Controller extends Admin_Controller
 
 	}
 
+	
 	private function _manage_bulk_json_nrs_environment($mqtt_topic,$nrs_entity_uid,$json_mqtt_payload)
 	{
 		$nrs_entity_id = 0;

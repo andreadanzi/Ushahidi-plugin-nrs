@@ -1,6 +1,6 @@
 <?php 
 /**
- * Messages view page.
+ * Environments view page.
  *
  * PHP version 5
  * LICENSE: This source file is subject to LGPL license 
@@ -23,11 +23,11 @@
 					<!-- tabset -->
 					<ul class="tabset">
 						<li><a href="<?php echo url::site() . 'admin/manage/nrs' ?>"><?php echo Kohana::lang('nrs.NRS_mqtt_deployments');?></a></li>
-						<li><a href="<?php echo url::site() . 'admin/manage/nrs/mqtt_messages' ?>" class="active"><?php echo Kohana::lang('nrs.NRS_mqtt_messages');?></a></li>
+						<li><a href="<?php echo url::site() . 'admin/manage/nrs/mqtt_messages' ?>"><?php echo Kohana::lang('nrs.NRS_mqtt_messages');?></a></li>
 						<li><a href="<?php echo url::site() . 'admin/manage/nrs_environments' ?>"><?php echo Kohana::lang('nrs.environments');?></a></li>
 						<li><a href="<?php echo url::site() . 'admin/manage/nrs_nodes' ?>"><?php echo Kohana::lang('nrs.nodes');?></a></li>
 						<li><a href="<?php echo url::site() . 'admin/manage/nrs_datastreams' ?>"><?php echo Kohana::lang('nrs.datastreams');?></a></li>
-						<li><a href="<?php echo url::site() . 'admin/manage/nrs_datapoints' ?>"><?php echo Kohana::lang('nrs.datapoints');?></a></li>
+						<li><a href="<?php echo url::site() . 'admin/manage/nrs_datapoints' ?>" class="active"><?php echo Kohana::lang('nrs.datapoints');?></a></li>
 					</ul>
 				
 					<!-- tab -->

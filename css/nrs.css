@@ -1,0 +1,16 @@
+ul.info li strong.nrs_status_4 {
+	font-weight:bold;
+	color:#00AF39;
+}
+ul.info li strong.nrs_status_3 {
+	font-weight:bold;
+	color:#00D4FF;
+}
+ul.info li strong.nrs_status_2 {
+	font-weight:bold;
+	color:#FFB900;
+}
+ul.info li strong.nrs_status_1 {
+	font-weight:bold;
+	color:#FF0000;
+}

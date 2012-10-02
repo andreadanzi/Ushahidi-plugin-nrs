@@ -21,6 +21,8 @@ class Nrs_environment_Model extends ORM
 	 */
 	protected $has_many = array('nrs_node','nrs_datapoint');
 
+	protected $belongs_to = array('location');
+
 	// Database table name
 	protected $table_name = 'nrs_environment';
 }

@@ -35,9 +35,10 @@ class nrs {
 	public function add()
 	{
 		// Only add the events if we are on that controller
-		if (Router::$controller == 'manage' or Router::$controller == 'nrs')
+		if (Router::$controller == 'manage' or Router::$controller == 'nrs' or Router::$controller == 'nrs_environments')
 		{
 			Event::add('ushahidi_action.nav_admin_manage', array($this,'_nrs'));
+			Event::add('ushahidi_action.header_scripts_admin', array($this, 'nrs_css_admin'));
 		}
 		elseif (strripos(Router::$current_uri, "main") !== false)
 		{
@@ -78,6 +79,15 @@ class nrs {
 	{
 		$js = View::factory('js/nrs_bar_js');
 		$js->render(TRUE);
+	}
+
+	/**
+	 * Loads the CSS for the nrs admin section
+	 */
+	public function nrs_css_admin()
+	{
+		$css = View::factory('css/nrs_css');
+		$css->render(TRUE);
 	}
 }
 new nrs;
