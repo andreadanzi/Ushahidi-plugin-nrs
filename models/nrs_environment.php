@@ -19,7 +19,7 @@ class Nrs_environment_Model extends ORM
 	 * One-to-many relationship definition
 	 * @var array
 	 */
-	protected $has_many = array('nrs_node','nrs_datapoint');
+	protected $has_many = array('nrs_node','nrs_datastream','nrs_datapoint');
 
 	protected $belongs_to = array('location');
 

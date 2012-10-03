@@ -145,7 +145,7 @@
 													<?php if($mqtt_subscription_active==1 || $mqtt_subscription_active==2) {?>
 													<a href="javascript:mqtt_subscriptionAction('h','STOP',<?php echo rawurlencode($nrs_mqtt_subscription_id);?>)" class="status_yes"><?php echo ($mqtt_subscription_active==2? Kohana::lang('nrs.mqtt_client_status_running') : Kohana::lang('nrs.mqtt_client_status_active') );?></a>
 													<?php } else {?>
-													<a href="javascript:mqtt_subscriptionAction('v','ACTIVATE',<?php echo rawurlencode($nrs_mqtt_subscription_id);?>)" class="status_yes"><?php echo  Kohana::lang('nrs.mqtt_client_status_stopped');?></a>
+													<a href="javascript:mqtt_subscriptionAction('v','ACTIVATE',<?php echo rawurlencode($nrs_mqtt_subscription_id);?>)" class="status_no"><?php echo  Kohana::lang('nrs.mqtt_client_status_stopped');?></a>
 													<?php } ?>
 													</li>
 <li><a href="javascript:mqtt_subscriptionAction('d','DELETE','<?php echo(rawurlencode($nrs_mqtt_subscription_id)); ?>')" class="del"><?php echo Kohana::lang('ui_main.delete');?></a></li>

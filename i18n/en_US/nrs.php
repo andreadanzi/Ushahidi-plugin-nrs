@@ -49,6 +49,9 @@
 	'location_elevation'=> 'Elevation (m.a.s.l.)',
 	'feed'=> 'Feed url',
 	'description'=> 'Description',
+	'env_status_1'=>'Active',
+	'env_status_2'=>'Alerted',
+	'env_status_3'=>'Hidden',
 
 	);	
 ?>

@@ -286,11 +286,11 @@ class Nrs_Controller extends Admin_Controller
 				if( !isset($location) || $location->id == 0 ) {
 					$location = new Location_Model();
 					$location->location_name = (isset($dec_environment->location_name) AND !empty($dec_environment->location_name)) ? $dec_environment->location_name : Kohana::lang('ui_admin.unknown');
+					$location->latitude = $nrs_environment->location_latitude;
+					$location->longitude = $nrs_environment->location_longitude;
+					$location->location_date = $updated_date;
+					$location->save();
 				}
-				$location->latitude = $nrs_environment->location_latitude;
-				$location->longitude = $nrs_environment->location_longitude;
-				$location->location_date = $updated_date;
-				$location->save();
 				$nrs_environment->location_id = $location->id;
 			}
 
@@ -507,11 +507,11 @@ class Nrs_Controller extends Admin_Controller
 			if(!isset($location) || $location->id == 0) {
 				$location = new Location_Model();
 				$location->location_name = (isset($location_name) AND !empty($location_name)) ?$location_name: Kohana::lang('ui_admin.unknown');
+				$location->latitude = $lat;
+				$location->longitude = $lon;
+				$location->location_date = date("Y-m-d H:i:s",time());
+				$location->save();
 			}
-			$location->latitude = $lat;
-			$location->longitude = $lon;
-			$location->location_date = date("Y-m-d H:i:s",time());
-			$location->save();
 			$location_id = $location->id;
 		}
 		// We need to check for existing Environments!!!

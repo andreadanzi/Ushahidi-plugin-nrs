@@ -14,3 +14,12 @@ ul.info li strong.nrs_status_1 {
 	font-weight:bold;
 	color:#FF0000;
 }
+div.nrs-col-1 {
+	float: left;
+	width: 370px;
+}
+div.nrs-col-2 {
+	float: left;
+	width: 506px;
+	padding: 0 14px 14px 10px;
+}

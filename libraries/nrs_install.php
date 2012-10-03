@@ -100,6 +100,7 @@ class Nrs_Install {
 				title varchar(100) NOT NULL,
 				environment_uid varchar(32) NOT NULL,
 				description text,
+				active tinyint(4) NOT NULL DEFAULT 1,
 				status tinyint(4) NOT NULL default '3' COMMENT '1 - DEAD, 2 - ZOMBIE, 3 - FROZEN, 4 - LIVE',
 				updated datetime DEFAULT NULL,
 				location_id bigint(20) DEFAULT NULL,
@@ -135,6 +136,7 @@ class Nrs_Install {
 		$this->db->query("
 			CREATE TABLE IF NOT EXISTS `".Kohana::config('database.default.table_prefix')."nrs_datastream` (
 				id int(11) unsigned NOT NULL AUTO_INCREMENT,
+				nrs_environment_id int(11)  NOT NULL DEFAULT '0',
 				nrs_node_id int(11)  NOT NULL DEFAULT '0',
 				title varchar(100) DEFAULT NULL,
 				datastream_uid varchar(32) NOT NULL,

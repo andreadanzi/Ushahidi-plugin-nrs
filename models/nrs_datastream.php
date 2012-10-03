@@ -21,7 +21,7 @@ class Nrs_datastream_Model extends ORM
 	 */
 	protected $has_many = array('nrs_datapoint');
 
-	protected $belongs_to = array('nrs_node');
+	protected $belongs_to = array('nrs_environment','nrs_node');
 	// Database table name
 	protected $table_name = 'nrs_datastream';
 }
