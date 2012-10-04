@@ -32,7 +32,7 @@ function fillEnvUID(elem,nrs_env_uids)
 }
 
 // NRS NodeJS
-function fillFields(nrs_node_id, nrs_node_title, nrs_node_desctiption,nrs_env_uid,nrs_only_node_uid,dispo,expo,status,risk_level,nrs_environment_id)
+function fillFields(nrs_node_id, nrs_node_title, nrs_node_desctiption,nrs_env_uid,nrs_only_node_uid,dispo,expo,status,risk_level,nrs_environment_id,last_update)
 {
 	$("#nrs_node_id").attr("value", decodeURIComponent(nrs_node_id));
 	$("#title").attr("value", decodeURIComponent(nrs_node_title));
@@ -45,6 +45,7 @@ function fillFields(nrs_node_id, nrs_node_title, nrs_node_desctiption,nrs_env_ui
 	$("#risk_level").attr("value", decodeURIComponent(risk_level));	
 	$("#nrs_environment_id").attr("value", decodeURIComponent(nrs_environment_id));
 	$("#node_uid").attr("value", decodeURIComponent(nrs_env_uid+nrs_only_node_uid));
+	$("#last_update").attr("value", decodeURIComponent(last_update));
 }
 
 // Ajax Submission

@@ -332,6 +332,8 @@ class Nrs_Controller extends Admin_Controller
 			}
 
 			$nrs_environment->status = $nrs_environment->status;
+			$nrs_environment->updated = $updated_date;	
+			$nrs_environment->save();
 			if( isset($dec_environment->nodes) && count($dec_environment->nodes)>0)
 			{
 				foreach( $dec_environment->nodes as $node )
@@ -360,6 +362,8 @@ class Nrs_Controller extends Admin_Controller
 						$nrs_node->node_exposure = $node->node_exposure;
 					}
 					$nrs_node->status = $node->status;
+					$nrs_node->updated = $updated_date;
+					$nrs_node->save();
 					if( isset($node->datastreams) && count($node->datastreams)>0)
 					{
 						foreach( $node->datastreams as $datastream )
@@ -373,6 +377,7 @@ class Nrs_Controller extends Admin_Controller
 							$nrs_datastream->title =$datastream->title;
 							$nrs_datastream->datastream_uid = $current_nrs_datastream_uid;
 							$nrs_datastream->nrs_node_id = $nrs_node->id;
+							$nrs_datastream->nrs_environment_id = $nrs_environment->id;
 
 							if(isset($datastream->unit_label))
 							{
@@ -407,6 +412,8 @@ class Nrs_Controller extends Admin_Controller
 								$nrs_datastream->max_value =  $datastream->max_value;
 							}
 
+							$nrs_datastream->updated = $updated_date;
+							$nrs_datastream->save();
 							if( isset($datastream->datapoints) && count($datastream->datapoints)>0)
 							{
 								foreach( $datastream->datapoints as $datapoint )
@@ -424,16 +431,10 @@ class Nrs_Controller extends Admin_Controller
 									$new_entity->save();	
 								}
 							}
-							$nrs_datastream->updated = $updated_date;
-							$nrs_datastream->save();
 						}
 					}
-					$nrs_node->updated = $updated_date;
-					$nrs_node->save();
 				}
 			}		
-			$nrs_environment->updated = $updated_date;	
-			$nrs_environment->save();
 			$nrs_entity_id = $nrs_environment->id;
 		}
 		return $nrs_entity_id;

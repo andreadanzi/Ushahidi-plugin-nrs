@@ -52,6 +52,9 @@
 	'env_status_1'=>'Active',
 	'env_status_2'=>'Alerted',
 	'env_status_3'=>'Hidden',
+        'node_uid' => 'Node UID',
+        'risk_level' => 'Risk Level',
+        'last_update' => 'Last Update',
 
 	);	
 ?>

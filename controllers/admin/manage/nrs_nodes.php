@@ -116,7 +116,7 @@ class Nrs_nodes_Controller extends Admin_Controller
 					$nrs_node->node_disposition = $post->node_disposition;
 					$nrs_node->node_exposure = $post->node_exposure;
 					$nrs_node->nrs_environment_id = $post->nrs_environment_id;
-					$nrs_node->last_update = $post->last_update;
+					// $nrs_node->last_update = $post->last_update;
 					$nrs_node->updated = date("Y-m-d H:i:s",time());
 					$nrs_node->risk_level = $post->risk_level;
 					$nrs_node->save();

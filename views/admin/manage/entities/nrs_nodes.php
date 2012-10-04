@@ -95,6 +95,7 @@
 									$nrs_node_id = $nrs_node->id;
 									$nrs_node_title = $nrs_node->title;
 									$nrs_node_active = $nrs_node->active;
+									$last_update = $nrs_node->last_update;
 									$nrs_node_description = $nrs_node->description;
 									$nrs_node_date = date('Y-m-d H:i:s', strtotime($nrs_node->updated));
 									$nrs_node_uid = $nrs_node->node_uid;
@@ -141,7 +142,7 @@
 
 										<td class="col-4">
 												<ul>
-													<li class="none-separator"><a href="#add" onClick="fillFields('<?php echo(rawurlencode($nrs_node_id)); ?>','<?php echo(rawurlencode($nrs_node_title)); ?>','<?php echo(rawurlencode($nrs_node_description)); ?>','<?php echo(rawurlencode($nrs_env_uid)); ?>','<?php echo(rawurlencode($nrs_only_node_uid)); ?>','<?php echo(rawurlencode($nrs_node->node_disposition)); ?>','<?php echo(rawurlencode($nrs_node->node_exposure)); ?>','<?php echo(rawurlencode($nrs_node->status)); ?>','<?php echo(rawurlencode($nrs_node->nrs_environment_id)); ?>')"><?php echo Kohana::lang('ui_main.edit');?></a></li>
+													<li class="none-separator"><a href="#add" onClick="fillFields('<?php echo(rawurlencode($nrs_node_id)); ?>','<?php echo(rawurlencode($nrs_node_title)); ?>','<?php echo(rawurlencode($nrs_node_description)); ?>','<?php echo(rawurlencode($nrs_env_uid)); ?>','<?php echo(rawurlencode($nrs_only_node_uid)); ?>','<?php echo(rawurlencode($nrs_node->node_disposition)); ?>','<?php echo(rawurlencode($nrs_node->node_exposure)); ?>','<?php echo(rawurlencode($nrs_node->status)); ?>','<?php echo(rawurlencode($nrs_node->risk_level)); ?>','<?php echo(rawurlencode($nrs_node->nrs_environment_id)); ?>','<?php echo(rawurlencode($nrs_node->last_update)); ?>')"><?php echo Kohana::lang('ui_main.edit');?></a></li>
 													<li class="none-separator">
 													<?php if($nrs_node_active==1 || $nrs_node_active==2) {?>
 													<a href="javascript:nodeAction('h','HIDE',<?php echo rawurlencode($nrs_node_id);?>)" class="status_yes"><?php echo ($nrs_node_active==2? Kohana::lang('nrs.env_status_2') : Kohana::lang('nrs.env_status_1') );?></a>
@@ -221,7 +222,7 @@
 						</div>
 						<div class="tab_form_item">
 							<strong><?php echo Kohana::lang('nrs.last_update');?>:</strong><br />
-							<?php print form::input('last_update', '', ' class="text"'); ?>
+							<?php print form::input('last_update', '', ' readonly="readonly" class="text"'); ?>
 						</div>
 						<div class="tab_form_item">
 							<strong><?php echo Kohana::lang('nrs.description');?>:</strong><br />
