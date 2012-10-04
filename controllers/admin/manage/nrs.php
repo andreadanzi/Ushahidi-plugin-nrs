@@ -331,7 +331,7 @@ class Nrs_Controller extends Admin_Controller
 				$nrs_environment->location_id = $location->id;
 			}
 
-			$nrs_environment->status = $nrs_environment->status;
+			$nrs_environment->status = $dec_environment->status;
 			$nrs_environment->updated = $updated_date;	
 			$nrs_environment->save();
 			if( isset($dec_environment->nodes) && count($dec_environment->nodes)>0)
