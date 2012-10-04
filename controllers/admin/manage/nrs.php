@@ -205,6 +205,18 @@ class Nrs_Controller extends Admin_Controller
 					$nrs_mqtt_message = ORM::factory('nrs_mqtt_message',$message_id);
 					$this->_parse_nrs_mqtt_message($nrs_mqtt_message);
 				}
+				// Save Action
+				else if ( $post->action == 'a') 
+				{ 
+					$mqtt_message = new Nrs_mqtt_message_Model($message_id);
+
+					$mqtt_message->mqtt_payload = trim($post->description);
+					$mqtt_message->mqtt_payloadlen = strlen($mqtt_message->mqtt_payload);
+					$mqtt_message->save();
+			
+					$form_saved = TRUE;
+					$form_action = utf8::strtoupper(Kohana::lang('ui_admin.created_edited'));
+				}
 
 			}
 		}
@@ -237,6 +249,31 @@ class Nrs_Controller extends Admin_Controller
 
 	}
 
+
+	public function edit_nrs_entity()
+	{
+		// ?nrs_type=1&nrs_id=3
+		if ( !empty($_GET['nrs_type']) && !empty($_GET['nrs_id']))
+		{
+			$type = $_GET['nrs_type'];
+			$id = $_GET['nrs_id'];
+			switch ($type) {
+				case 1:  // 1 - Environment 12 columns
+				   	url::redirect('admin/manage/nrs_environments/id/'.$id);
+				   	break;
+				case 2:  // 2 - Node 6 columns
+				   	url::redirect('admin/manage/nrs_nodes?nrs_id='.$id);
+				   	
+					break;
+				case 3:   // 3 - Datastream 9 columns 
+				   
+					break;
+				case 4:   // 4 - Datapoint 3 columns
+				  
+					break;
+			}
+		}
+	}
 	
 	private function _manage_bulk_json_nrs_environment($mqtt_topic,$nrs_entity_uid,$json_mqtt_payload)
 	{

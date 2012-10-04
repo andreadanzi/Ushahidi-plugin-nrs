@@ -18,6 +18,13 @@ class Nrs_environments_Controller extends Admin_Controller
 		//$this->_registered_blocks = Kohana::config("settings.blocks");
 	}
 	
+
+
+	public function id()
+	{	
+		$this->index();
+	}
+
 	function index()
 	{
 		$this->template->content = new View('admin/manage/entities/nrs_environments');

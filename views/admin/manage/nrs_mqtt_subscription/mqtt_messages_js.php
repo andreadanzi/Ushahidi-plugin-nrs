@@ -21,10 +21,11 @@ function preview ( id ){
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL) 
  */
 // Categories JS
-function fillFields(id )
+function fillFields(id,title,  descr )
 {
-	$("#nrs_mqtt_subscription_id").attr("value", decodeURIComponent(id));
-	
+	$("#nrs_mqtt_message_id").attr("value", decodeURIComponent(id));
+	$("#title").attr("value", decodeURIComponent(title));
+	$("#description").attr("value", decodeURIComponent(descr));
 }
 
 // Form Submission

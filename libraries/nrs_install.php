@@ -123,6 +123,7 @@ class Nrs_Install {
 				title varchar(100) DEFAULT NULL,
 				node_uid varchar(32) NOT NULL,
 				description text,
+				active tinyint(4) NOT NULL DEFAULT 1,
 				status tinyint(4) NOT NULL default '3' COMMENT '1 - OFF, 2 - SLEEPING, 3 - ON, 4 - TRANSMITTING',
 				node_disposition varchar(255) DEFAULT NULL,
 				node_exposure varchar(255) DEFAULT NULL,

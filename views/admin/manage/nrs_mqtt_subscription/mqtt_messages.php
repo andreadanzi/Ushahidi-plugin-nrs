@@ -126,6 +126,7 @@
 										<td class="col-3"><?php echo $message_date; ?></td>
 										<td class="col-4">
 											<ul>
+												<li class="none-separator"><a href="#add" onClick="fillFields('<?php echo(rawurlencode($message_id)); ?>','<?php echo(rawurlencode($message_title)); ?>','<?php echo(rawurlencode($message_description)); ?>')"><?php echo Kohana::lang('ui_main.edit');?></a></li>
 												<?php
 												if ($nrs_entity_id != 0) {
 													echo "<li class=\"none-separator\"><a href=\"". url::base() . 'admin/manage/nrs/edit_nrs_entity?nrs_type='.$nrs_entity_type.'&amp;nrs_id=' . $nrs_entity_id ."\" class=\"status_yes\"><strong>".Kohana::lang('nrs.view_entity')."</strong></a></li>";
@@ -155,5 +156,41 @@
 
 
 				<?php print form::close(); ?>
+
+				<!-- tabs -->
+				<div class="tabs">
+					<!-- tabset -->
+					<a name="add"></a>
+					<ul class="tabset">
+						<li><a href="#" class="active"><?php echo Kohana::lang('ui_main.add_edit');?></a></li>
+					</ul>
+					<!-- tab -->
+					<div class="tab">
+						<?php print form::open(NULL,array('id' => 'mqtt_messageMain', 'name' => 'mqtt_messageMain')); ?>
+						
+						<input type="hidden" id="nrs_mqtt_message_id" 
+							name="nrs_mqtt_message_id" value="" />
+						<input type="hidden" name="action" 
+							id="action" value="a"/>
+						<div class="tab_form_item">
+							<strong><?php echo Kohana::lang('ui_main.name');?>:</strong><br />
+							<?php print form::input('title', '', ' readonly="readonly" class="text long"'); ?>
+						</div>
+						<div style="clear:both"></div>
+						<div class="tab_form_item">
+							<strong><?php echo Kohana::lang('nrs.description');?>:</strong><br />
+							<?php print form::textarea('description','', ' rows="12" cols="100"') ?>
+
+						</div>
+						<div style="clear:both"></div>
+						<div class="tab_form_item">
+							<input type="submit" class="save-rep-btn" value="<?php echo Kohana::lang('ui_main.save');?>" />
+						</div>
+
+
+						<?php print form::close(); ?>			
+					</div>
+				</div>
+
 
 			</div>
