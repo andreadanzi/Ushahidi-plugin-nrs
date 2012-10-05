@@ -141,6 +141,7 @@ class Nrs_Install {
 				nrs_node_id int(11)  NOT NULL DEFAULT '0',
 				title varchar(100) DEFAULT NULL,
 				datastream_uid varchar(32) NOT NULL,
+				active tinyint(4) NOT NULL DEFAULT 1,
 				unit_label varchar(100) DEFAULT NULL,
 				unit_type varchar(100) DEFAULT NULL,
 				unit_symbol varchar(100) DEFAULT NULL,

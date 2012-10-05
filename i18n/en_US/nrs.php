@@ -38,7 +38,7 @@
         'mqtt_client_status_stopped' => 'Stopped',
         'create_entity' => 'Create Entity',
         'view_entity' => 'View Entity',
-	'preview_description'=>'Preview environment',
+	'preview_description'=>'Preview',
 	'environment_uid'=> 'UID',
 	'status'=> 'Status',
 	'location_name'=> 'Location Name',

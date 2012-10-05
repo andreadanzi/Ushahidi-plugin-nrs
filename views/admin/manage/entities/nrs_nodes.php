@@ -128,7 +128,7 @@
 											<div class="post">
 
 												<h4><a href="<?php echo url::site() . 'admin/manage/nrs_nodes/edit/' . $nrs_node_id; ?>" class="more"><?php echo $nrs_node_title; ?></a>&nbsp;&nbsp;&nbsp;[<a href="<?php echo url::base() . 'admin/manage/nrs_datastreams/node/'.$nrs_node_id ?>"><?php echo  "#".$datastreams_count ." ". Kohana::lang('nrs.datastreams');?></a>]</h4>
-												<p><a href="javascript:preview('message_preview_<?php echo $nrs_node_id?>')"><?php echo Kohana::lang('nrs.preview_description') .' with uid='.$nrs_node_uid;?></a></p>
+												<p><a href="javascript:preview('message_preview_<?php echo $nrs_node_id?>')"><?php echo Kohana::lang('nrs.preview_description'). ' '. Kohana::lang('nrs.node') .' with uid='.$nrs_node_uid;?></a></p>
 												<div id="message_preview_<?php echo $nrs_node_id?>" style="display:none;">
 													<?php echo $nrs_node_description; ?>
 												</div>
