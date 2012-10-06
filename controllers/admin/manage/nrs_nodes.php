@@ -17,7 +17,6 @@ class Nrs_nodes_Controller extends Admin_Controller
 		
 		//$this->_registered_blocks = Kohana::config("settings.blocks");
 	}
-	
 
 	public function environment()
 	{	

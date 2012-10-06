@@ -135,7 +135,7 @@
 											</div>
 											<ul class="info">
 												<li class="none-separator">Status: <strong class="nrs_status_<?php echo $status_id;?>"><?php echo $status_descr;?></strong></li>
-<li><?php echo Kohana::lang('ui_main.geolocation_available');?>?: <strong><?php echo ($nrs_environment->location->id) ? utf8::strtoupper(Kohana::lang('ui_main.yes')). " - ".$nrs_environment->location->location_name : utf8::strtoupper(Kohana::lang('ui_main.no'));?></strong></li>
+<li><?php echo Kohana::lang('ui_main.geolocation_available');?>?: <strong><a href="<?php echo url::site() . 'admin/manage/nrs_environments/id/' . $nrs_environment->id; ?>"><?php echo ($nrs_environment->location->id) ? utf8::strtoupper(Kohana::lang('ui_main.yes')). " - ".$nrs_environment->location->location_name : utf8::strtoupper(Kohana::lang('ui_main.no')). " - ".$nrs_environment->title;?></a></strong></li>
 											</ul>
 										</td>
 										<td class="col-3"><?php echo $nrs_node_date; ?></td>

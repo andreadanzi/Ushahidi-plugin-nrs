@@ -55,6 +55,15 @@
         'node_uid' => 'Node UID',
         'risk_level' => 'Risk Level',
         'last_update' => 'Last Update',
+	'datastream_uid'=>'Datastream UID',
+	'unit_label'=>'Unit Label',
+	'unit_type'=>'Unit Type',
+	'unit_symbol'=>'Unit Symbol',
+	'unit_format'=>'Unit Format',
+	'tags' => 'Tags',
+	'current_value' => 'Current Value',
+	'max_value' => 'Max Value',
+	'min_value' => 'Min Value',
 
 	);	
 ?>

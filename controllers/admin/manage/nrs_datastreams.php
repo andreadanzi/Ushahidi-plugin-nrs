@@ -159,6 +159,7 @@ class Nrs_datastreams_Controller extends Admin_Controller
 		$this->template->content->nrs_datastreams = $nrs_datastreams;
 		$this->template->content->environments_array = $this->_environments_array();
 		$this->template->content->environment_uids_array = $this->_environment_uids_array();
+		$this->template->content->nodes_uids_array = $this->_nodes_uids_array();
 		$this->template->content->nodes_array = $this->_nodes_array();
 		$this->template->content->pagination = $pagination;
 		$this->template->content->form_error = $form_error;
@@ -199,7 +200,20 @@ class Nrs_datastreams_Controller extends Admin_Controller
 		return $environment_array;
 	}
 
-	// Function environment_array
+	// Function nodes_uids_array
+	private function _nodes_uids_array()
+	{
+		$orm_nodes = ORM::factory('nrs_node')->find_all();
+		$node_array = array();
+		foreach($orm_nodes as $orm_node)
+		{
+			$arr_res = sscanf($orm_node->node_uid,$orm_node->nrs_environment->environment_uid."%s");
+			$nrs_only_node_uid = $arr_res[0];
+			$node_array[$orm_node->id] = array("id"=>$orm_node->id, "title" =>  $orm_node->title , "uid" => $nrs_only_node_uid, "env_uid" => $orm_node->nrs_environment->environment_uid, "env_id" => $orm_node->nrs_environment->environment_uid);
+		}
+		return $node_array;
+	}
+	// Function nodes_array
 	private function _nodes_array()
 	{
 		$orm_nodes = ORM::factory('nrs_node')->find_all();
@@ -208,7 +222,7 @@ class Nrs_datastreams_Controller extends Admin_Controller
 		{
 			$arr_res = sscanf($orm_node->node_uid,$orm_node->nrs_environment->environment_uid."%s");
 			$nrs_only_node_uid = $arr_res[0];
-			$node_array[$orm_node->nrs_environment->id][$orm_node->id] = array("id"=>$orm_node->id, "title" =>  $orm_node->title , "uid" => $nrs_only_node_uid, "env_uid" => $orm_node->nrs_environment->environment_uid);
+			$node_array[$orm_node->id] = $orm_node->nrs_environment->title . "(".$orm_node->nrs_environment->environment_uid.") => " . $orm_node->title . "(".$nrs_only_node_uid.")";
 		}
 		return $node_array;
 	}

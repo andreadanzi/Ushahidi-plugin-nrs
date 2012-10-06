@@ -25,7 +25,7 @@
 						<li><a href="<?php echo url::site() . 'admin/manage/nrs' ?>"><?php echo Kohana::lang('nrs.NRS_mqtt_deployments');?></a></li>
 						<li><a href="<?php echo url::site() . 'admin/manage/nrs/mqtt_messages' ?>"><?php echo Kohana::lang('nrs.NRS_mqtt_messages');?></a></li>
 						<li><a href="<?php echo url::site() . 'admin/manage/nrs_environments' ?>"><?php echo Kohana::lang('nrs.environments');?></a></li>
-						<li><a href="<?php echo url::site() . 'admin/manage/nrs_datastreams' ?>"><?php echo Kohana::lang('nrs.datastreams');?></a></li>
+						<li><a href="<?php echo url::site() . 'admin/manage/nrs_nodes' ?>"><?php echo Kohana::lang('nrs.nodes');?></a></li>
 						<li><a href="<?php echo url::site() . 'admin/manage/nrs_datastreams' ?>" class="active"><?php echo Kohana::lang('nrs.datastreams');?></a></li>
 						<li><a href="<?php echo url::site() . 'admin/manage/nrs_datapoints' ?>"><?php echo Kohana::lang('nrs.datapoints');?></a></li>
 					</ul>
@@ -125,8 +125,8 @@
 												</div>
 											</div>
 											<ul class="info">
-												<li class="none-separator">Node: <strong><?php echo $nrs_node->title;?></strong></li>
-<li><?php echo Kohana::lang('ui_main.geolocation_available');?>?: <strong><?php echo ($nrs_environment->location->id) ? utf8::strtoupper(Kohana::lang('ui_main.yes')). " - ".$nrs_environment->location->location_name : utf8::strtoupper(Kohana::lang('ui_main.no'));?></strong></li>
+												<li class="none-separator">Node: <strong><a href="<?php echo url::site() . 'admin/manage/nrs_nodes?nrs_id=' . $nrs_node->id; ?>"><?php echo $nrs_node->title;?></a></strong></li>
+<li><?php echo Kohana::lang('ui_main.geolocation_available');?>?: <strong><a href="<?php echo url::site() . 'admin/manage/nrs_environments/id/' . $nrs_environment->id; ?>"><?php echo ($nrs_environment->location->id) ? utf8::strtoupper(Kohana::lang('ui_main.yes')). " - ".$nrs_environment->location->location_name : utf8::strtoupper(Kohana::lang('ui_main.no'));?></a></strong></li>
 											</ul>
 										</td>
 										<td class="col-3"><?php echo $nrs_datastream_date; ?></td>
@@ -173,6 +173,8 @@
 							name="nrs_datastream_id" value="" />
 						<input type="hidden" id="datastream_uid" 
 							name="datastream_uid" value="" />
+						<input type="hidden" id="nrs_environment_id" 
+							name="nrs_environment_id" value="" />
 						<input type="hidden" name="action" 
 							id="action" value="a"/>
 						<div class="tab_form_item">
@@ -186,16 +188,10 @@
 							<?php print form::input('only_datastream_uid', '', ' class="text uid"'); ?>
 						</div>
 						<div class="tab_form_item">
-							<strong><?php echo Kohana::lang('nrs.environment');?>:</strong><br />
-
-							<?php print '<span class="sel-holder">' .
-								    form::dropdown('nrs_environment_id', $environments_array,'','  onClick=\'fillEnvUID(this,'.json_encode($environment_uids_array).');\'') . '</span>'; ?>
-						</div>
-						<div class="tab_form_item">
 							<strong><?php echo Kohana::lang('nrs.node');?>:</strong><br />
 
 							<?php print '<span class="sel-holder">' .
-								    form::dropdown('nrs_node_id', $environments_array,'','  onClick=\'fillNodeUID(this,'.json_encode($environment_uids_array).');\'') . '</span>'; ?>
+								    form::dropdown('nrs_node_id', $nodes_array,'','  onClick=\'fillNodeUID(this,'.json_encode($nodes_uids_array).');\'') . '</span>'; ?>
 						</div>
 						<div style="clear:both"></div>
 						<div class="tab_form_item">
@@ -208,15 +204,28 @@
 						</div>
 						<div class="tab_form_item">
 							<strong><?php echo Kohana::lang('nrs.unit_symbol');?>:</strong><br />
-							<?php print form::input('unit_symbol', '', ' readonly="readonly" class="text"'); ?>
+							<?php print form::input('unit_symbol', '', ' class="text small"'); ?>
 						</div>
 						<div class="tab_form_item">
 							<strong><?php echo Kohana::lang('nrs.unit_format');?>:</strong><br />
-							<?php print form::input('unit_format', '', ' readonly="readonly" class="text"'); ?>
+							<?php print form::input('unit_format', '', ' class="text"'); ?>
+						</div>
+						<div style="clear:both"></div>
+						<div class="tab_form_item">
+							<strong><?php echo Kohana::lang('nrs.current_value');?>:</strong><br />
+							<?php print form::input('current_value', '', ' class="text"'); ?>
+						</div>
+						<div class="tab_form_item">
+							<strong><?php echo Kohana::lang('nrs.min_value');?>:</strong><br />
+							<?php print form::input('min_value', '', ' class="text"'); ?>
+						</div>
+						<div class="tab_form_item">
+							<strong><?php echo Kohana::lang('nrs.max_value');?>:</strong><br />
+							<?php print form::input('max_value', '', ' class="text"'); ?>
 						</div>
 						<div class="tab_form_item">
 							<strong><?php echo Kohana::lang('nrs.tags');?>:</strong><br />
-							<?php print form::input('tags', '', ' readonly="readonly" class="text long"'); ?>
+							<?php print form::input('tags', '', ' class="text long"'); ?>
 						</div>
 						<div style="clear:both"></div>
 						<div class="tab_form_item">
