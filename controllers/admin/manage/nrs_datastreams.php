@@ -170,6 +170,7 @@ class Nrs_datastreams_Controller extends Admin_Controller
 
 		$this->template->content->total_items = $pagination->total_items;
 		$this->template->js = new View('admin/manage/entities/nrs_datastreams_js');
+		$this->template->js->nrs_datastreams = $nrs_datastreams;
 	
 	}
 

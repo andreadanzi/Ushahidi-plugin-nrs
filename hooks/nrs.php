@@ -39,12 +39,14 @@ class nrs {
 		{
 			Event::add('ushahidi_action.nav_admin_manage', array($this,'_nrs'));
 			Event::add('ushahidi_action.header_scripts_admin', array($this, 'nrs_css_admin'));
+			Event::add('ushahidi_action.header_scripts_admin', array($this, 'nrs_google_js'));
 		}
 		elseif (strripos(Router::$current_uri, "main") !== false)
 		{
 			Event::add('ushahidi_action.header_scripts', array($this, 'nrs_js'));
 			Event::add('ushahidi_action.main_sidebar', array($this, 'nrs_bar'));
 		}
+		// Event::add('ushahidi_action.header_scripts', array($this, 'nrs_google_js'));
 	}
 
 	public function _nrs()
@@ -78,6 +80,15 @@ class nrs {
 	public function nrs_js()
 	{
 		$js = View::factory('js/nrs_bar_js');
+		$js->render(TRUE);
+	}
+	/**
+	 * Loads the JavaScript for the nrs sidebar
+	 */
+	public function nrs_google_js()
+	{
+
+		$js = View::factory('js/google_charts_js');
 		$js->render(TRUE);
 	}
 

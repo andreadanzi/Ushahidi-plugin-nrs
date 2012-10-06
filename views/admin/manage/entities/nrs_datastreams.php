@@ -122,6 +122,7 @@
 												<p><a href="javascript:preview('message_preview_<?php echo $nrs_datastream_id?>')"><?php echo Kohana::lang('nrs.preview_description'). ' '. Kohana::lang('nrs.datastream') .' with uid='.$nrs_datastream_uid;?></a></p>
 												<div id="message_preview_<?php echo $nrs_datastream_id?>" style="display:none;">
 													<?php echo $nrs_datastream_description; ?>
+													<div id="visualization_<?php echo $nrs_datastream_id?>" style="width: 500px; height: 400px;"></div>
 												</div>
 											</div>
 											<ul class="info">
