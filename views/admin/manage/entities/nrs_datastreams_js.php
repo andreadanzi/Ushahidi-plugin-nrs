@@ -27,29 +27,33 @@ function drawVisualization() {
 		$nrs_datastream_id = $nrs_datastream->id;
 	?>   
         data = google.visualization.arrayToDataTable([
-          ['x', 'Cats', 'Blanket 1', 'Blanket 2'],
-          ['A',   1,       1,           0.5],
-          ['B',   2,       0.5,         1],
-          ['C',   4,       1,           0.5],
-          ['D',   8,       0.5,         1],
-          ['E',   7,       1,           0.5],
-          ['F',   7,       0.5,         1],
-          ['G',   8,       1,           0.5],
-          ['H',   4,       0.5,         1],
-          ['I',   2,       1,           0.5],
-          ['J',   3.5,     0.5,         1],
-          ['K',   3,       1,           0.5],
-          ['L',   3.5,     0.5,         1],
-          ['M',   1,       1,           0.5],
-          ['N',   1,       0.5,         1]
+          ['Sample', '<?php echo $nrs_datastream->unit_label;?>(<?php echo $nrs_datastream->unit_symbol;?>)'],
+	<?php
+		$max_number = 10;
+		$nrs_datapoints_count = ORM::factory('nrs_datapoint')
+						->where('nrs_datastream_id',$nrs_datastream_id)
+						->count_all();
+		if($nrs_datapoints_count<$max_number) $nrs_datapoints_count = $max_number;
+		$nrs_datapoints = ORM::factory('nrs_datapoint')
+						->where('nrs_datastream_id',$nrs_datastream_id)
+						->orderby('sample_no','asc')
+						->find_all(10,$nrs_datapoints_count-$max_number);
+		
+		foreach ($nrs_datapoints as $nrs_datapoint)
+		{
+	?>   
+          ['<?php echo $nrs_datapoint->sample_no;?>',   <?php echo $nrs_datapoint->value_at;?>],
+
+	<?php	
+		}
+	?>
         ]);
 	var created = null;
 	  
         // Create and draw the visualization.
         created = new google.visualization.LineChart(document.getElementById('visualization_<?php echo $nrs_datastream_id;?>')).
             draw(data, {curveType: "function",
-                        width: 500, height: 400,
-                        vAxis: {maxValue: 10}}
+                        width: 500, height: 400}
                 );
 	<?php	
 	}
