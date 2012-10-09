@@ -166,6 +166,8 @@ class Nrs_nodes_Controller extends Admin_Controller
 
 		$this->template->content->total_items = $pagination->total_items;
 		$this->template->js = new View('admin/manage/entities/nrs_nodes_js');
+		$this->template->js->nrs_nodes = $nrs_nodes;
+		$this->template->js->nrs_datapoints = $this->_datapoints_array();
 	
 	}
 
@@ -211,6 +213,51 @@ class Nrs_nodes_Controller extends Admin_Controller
 			$environment_array[$orm_environment->id] = $orm_environment->environment_uid;
 		}
 		return $environment_array;
+	}
+	// Function _datapoints_array
+	private function _datapoints_array()
+	{
+		if ( !empty($_GET['nrs_id']))
+		{
+			$id = $_GET['nrs_id'];
+			$orm_nodes = ORM::factory('nrs_node')->where('id',$id)->find_all();
+		}	
+		else {			
+			$orm_nodes = ORM::factory('nrs_node')->find_all();
+		}
+		$datapoints_array = array();
+		foreach($orm_nodes as $node)
+		{
+			$nrs_datastreams = ORM::factory('nrs_datastream')->where('nrs_node_id',$node->id)->find_all();
+			$sql_query = "SELECT nrs_environment_id, updated, sample_no";
+			foreach ($nrs_datastreams as $nrs_datastream)
+			{
+				$sql_query .= ", SUM(CASE WHEN `nrs_datastream_id` = '".$nrs_datastream->id."' THEN `value_at` ELSE 0 END) AS 'ds".$nrs_datastream->id."'";
+			}
+			$sql_query .= " FROM nrs_datapoint WHERE nrs_node_id = ";
+			$sql_query .= $node->id;
+			$sql_query .= " GROUP BY nrs_environment_id ,updated ,sample_no ORDER BY datetime_at DESC LIMIT 0,10";
+			$db_instance = Database::instance('default');
+			$results = $db_instance->query($sql_query);
+			if(isset($results) && count($results)>0)
+			{
+				$datapoints_array["head"][$node->id] = $nrs_datastreams;
+				$array_list=array();
+				$i=0;
+				foreach ($results as $nrs_row)
+				{
+					$array_item["sample_no"]=$nrs_row->sample_no;
+					foreach ($nrs_datastreams as $nrs_datastream)
+					{
+						$array_item["ds". $nrs_datastream->id] = $nrs_row->{"ds".$nrs_datastream->id};
+					}
+					$array_list[$i]=$array_item;
+					$i++;
+				}
+				$datapoints_array["array_items"][$node->id] = array_reverse($array_list);
+			}
+		}
+		return $datapoints_array;
 	}
 
 }

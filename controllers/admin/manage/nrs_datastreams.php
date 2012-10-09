@@ -121,6 +121,11 @@ class Nrs_datastreams_Controller extends Admin_Controller
 					$nrs_datastream->max_value = $post->max_value;
 					$nrs_datastream->nrs_environment_id = $post->nrs_environment_id;
 					$nrs_datastream->nrs_node_id = $post->nrs_node_id;
+					$nrs_datastream->samples_num = $post->samples_num;
+					$nrs_datastream->factor_title = $post->factor_title;
+					$nrs_datastream->factor_value = $post->factor_value;
+					$nrs_datastream->lambda_value = $post->lambda_value;
+					$nrs_datastream->constant_value = $post->constant_value;
 					$nrs_datastream->updated = date("Y-m-d H:i:s",time());
 					$nrs_datastream->save();
 			

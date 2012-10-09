@@ -15,6 +15,66 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL) 
  */
 ?>
+/*
+
+<?php print_r($nrs_datapoints ); ?>
+*/
+
+
+function drawVisualization() {
+	var data = null;
+	 // Create and populate the data table.
+	<?php	
+	foreach ($nrs_datapoints["head"] as $key=>$nrs_datastreams)
+	{
+		$nrs_node_id = $key;
+	?>   
+        data = google.visualization.arrayToDataTable([
+		 ['Sample'
+	<?php		
+		foreach ($nrs_datastreams as $nrs_datastream)
+		{
+			$nrs_datastream_id = $nrs_datastream->id;
+	?> 
+          ,'<?php echo $nrs_datastream->unit_label;?>(<?php echo $nrs_datastream->unit_symbol;?>)'
+	<?php	
+		}
+	?>
+		]
+	<?php
+		$array_items = $nrs_datapoints["array_items"][$nrs_node_id];
+		for($i=0;$i<min(10,count($array_items));$i++)
+		{
+			$nrs_row = $array_items[$i];
+			
+	?>   
+          ,['<?php echo $nrs_row["sample_no"];?>'
+	
+		<?php
+			foreach ($nrs_datastreams as $nrs_datastream)
+			{
+				$nrs_datastream_id = $nrs_datastream->id;
+				echo ",". $nrs_row["ds".$nrs_datastream_id];
+			}
+		?>
+	  ]
+
+	<?php	
+			
+		}
+	?>
+        ]);
+	var created = null;
+	  
+        // Create and draw the visualization.
+        created = new google.visualization.LineChart(document.getElementById('visualization_<?php echo $nrs_node_id;?>')).
+            draw(data, {curveType: "function",
+                        width: 500, height: 400}
+                );
+	<?php	
+	}
+	?>
+}
 
 // Preview Node
 function preview ( id ){
@@ -63,3 +123,4 @@ function nodeAction( action, confirmAction, id )
 	}
 }
 
+google.setOnLoadCallback(drawVisualization);

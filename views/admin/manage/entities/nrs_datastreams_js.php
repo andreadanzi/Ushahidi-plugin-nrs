@@ -27,22 +27,38 @@ function drawVisualization() {
 		$nrs_datastream_id = $nrs_datastream->id;
 	?>   
         data = google.visualization.arrayToDataTable([
-          ['Sample', '<?php echo $nrs_datastream->unit_label;?>(<?php echo $nrs_datastream->unit_symbol;?>)'],
+          ['Sample', '<?php echo $nrs_datastream->unit_label;?>(<?php echo $nrs_datastream->unit_symbol;?>)','AVG'],
 	<?php
-		$max_number = 10;
+		$max_number = $nrs_datastream->samples_num;
 		$nrs_datapoints_count = ORM::factory('nrs_datapoint')
 						->where('nrs_datastream_id',$nrs_datastream_id)
 						->count_all();
-		if($nrs_datapoints_count<$max_number) $nrs_datapoints_count = $max_number;
+		if($nrs_datapoints_count<$max_number) $max_number = $nrs_datapoints_count;
 		$nrs_datapoints = ORM::factory('nrs_datapoint')
 						->where('nrs_datastream_id',$nrs_datastream_id)
-						->orderby('sample_no','asc')
-						->find_all(10,$nrs_datapoints_count-$max_number);
-		
+						->orderby('datetime_at','asc')
+						->find_all($max_number,$nrs_datapoints_count-$max_number);
+		$avg=0;
 		foreach ($nrs_datapoints as $nrs_datapoint)
 		{
+                  $value_at = $nrs_datapoint->value_at;
+                  if(isset($nrs_datastream->factor_title) && $nrs_datastream->factor_title!="")
+		  {
+			$value_at = $nrs_datastream->constant_value + ($nrs_datapoint->value_at - $nrs_datastream->lambda_value)*$nrs_datastream->factor_value;
+                  }
+                  $avg = $avg + $value_at;
+		}
+		$avg=$avg/$max_number;
+		foreach ($nrs_datapoints as $nrs_datapoint)
+		{
+                  $value_at = $nrs_datapoint->value_at;
+                  if(isset($nrs_datastream->factor_title) && $nrs_datastream->factor_title!="")
+		  {
+			$value_at = $nrs_datastream->constant_value + ($nrs_datapoint->value_at - $nrs_datastream->lambda_value)*$nrs_datastream->factor_value;
+                  }
+
 	?>   
-          ['<?php echo $nrs_datapoint->sample_no;?>',   <?php echo $nrs_datapoint->value_at;?>],
+          ['<?php echo $nrs_datapoint->sample_no;?>',   <?php echo $value_at;?>,  <?php echo $avg;?>],
 
 	<?php	
 		}
@@ -91,7 +107,7 @@ function fillNodeUID(elem, nrs_node_uids)
 }
 
 // NRS datastream JS
-function fillFields(nrs_datastream_id,nrs_datastream_title,nrs_datastream_unit_label,nrs_datastream_unit_type,nrs_datastream_unit_symbol,nrs_datastream_unit_format,nrs_env_uid,nrs_only_node_uid,nrs_only_datastream_uid,tags,current_value,min_value,max_value,nrs_environment_id,nrs_node_id)
+function fillFields(nrs_datastream_id,nrs_datastream_title,nrs_datastream_unit_label,nrs_datastream_unit_type,nrs_datastream_unit_symbol,nrs_datastream_unit_format,nrs_env_uid,nrs_only_node_uid,nrs_only_datastream_uid,tags,current_value,min_value,max_value,nrs_environment_id,nrs_node_id, samples_num, factor_title, factor_value, lambda_value, constant_value)
 {
 	$("#nrs_datastream_id").attr("value", decodeURIComponent(nrs_datastream_id));
 	$("#nrs_node_id").attr("value", decodeURIComponent(nrs_node_id));
@@ -108,9 +124,18 @@ function fillFields(nrs_datastream_id,nrs_datastream_title,nrs_datastream_unit_l
 	$("#current_value").attr("value", decodeURIComponent(current_value));
 	$("#min_value").attr("value", decodeURIComponent(min_value));
 	$("#max_value").attr("value", decodeURIComponent(max_value));
+	$("#samples_num").attr("value", decodeURIComponent(samples_num));
+
+	$("#factor_title").attr("value", decodeURIComponent(factor_title));
+	$("#factor_value").attr("value", decodeURIComponent(factor_value));
+	$("#lambda_value").attr("value", decodeURIComponent(lambda_value));
+	$("#constant_value").attr("value", decodeURIComponent(constant_value));
 		
 	$("#nrs_environment_id").attr("value", decodeURIComponent(nrs_environment_id));
 	$("#datastream_uid").attr("value", decodeURIComponent(nrs_env_uid+nrs_only_node_uid+nrs_only_datastream_uid));
+
+					
+
 }
 
 

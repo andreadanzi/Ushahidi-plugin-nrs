@@ -151,6 +151,12 @@ class Nrs_Install {
 				min_value float DEFAULT NULL,
 				max_value float DEFAULT NULL,
 				updated datetime DEFAULT NULL,
+				samples_num int(11)  NOT NULL DEFAULT '10',
+				factor_title varchar(100) DEFAULT NULL,
+				factor_value DECIMAL(10,6) NOT NULL DEFAULT '1.00',
+				lambda_value DECIMAL(10,6) NOT NULL DEFAULT '0.00',
+				constant_value DECIMAL(10,6) NOT NULL DEFAULT '0.00',
+				trigger_type tinyint(4) NULL default NULL COMMENT '1 - value_at => max_value, 2 - value_at <= min_value, 3 - max_value <= value_at or value_at <= min_value, 4 - min_value <= value_at <= max_value, 5 - AVG(value_at) >= max_value, 6 - AVG(value_at) <= min_value',
 				PRIMARY KEY (id)
 			);
 		");
@@ -165,7 +171,21 @@ class Nrs_Install {
 				updated datetime DEFAULT NULL,
 				datetime_at varchar(30) NOT NULL DEFAULT '0000-00-00 00:00:00.000000',
 				sample_no int(11) NOT NULL DEFAULT '0',
-				value_at float NOT NULL,
+				value_at DECIMAL(10,6) NOT NULL DEFAULT '0',
+				PRIMARY KEY (id)
+			);
+		");
+
+		$this->db->query("
+			CREATE TABLE IF NOT EXISTS `".Kohana::config('database.default.table_prefix')."nrs_csv_client` (
+				id int(11) unsigned NOT NULL AUTO_INCREMENT,
+				active tinyint(4) NOT NULL DEFAULT 1,
+				folder text,
+				file_name text,
+				sha256sum text,
+                                noitems int(11) NOT NULL DEFAULT '0',
+				saved_folder text,
+				updated timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				PRIMARY KEY (id)
 			);
 		");
@@ -187,5 +207,6 @@ class Nrs_Install {
 		$this->db->query('DROP TABLE `'.Kohana::config('database.default.table_prefix').'nrs_environment`');
 		$this->db->query('DROP TABLE `'.Kohana::config('database.default.table_prefix').'nrs_mqtt_message`');
 		$this->db->query('DROP TABLE `'.Kohana::config('database.default.table_prefix').'nrs_mqtt_subscription`');
+		$this->db->query('DROP TABLE `'.Kohana::config('database.default.table_prefix').'nrs_csv_client`');
 	}
 }

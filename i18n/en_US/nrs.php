@@ -61,9 +61,10 @@
 	'unit_symbol'=>'Unit Symbol',
 	'unit_format'=>'Unit Format',
 	'tags' => 'Tags',
-	'current_value' => 'Current Value',
+	'current_value' => 'Last Value',
 	'max_value' => 'Max Value',
 	'min_value' => 'Min Value',
+	'NO_DATAPOINTS'=>'No datapoints available',
 
 	);	
 ?>

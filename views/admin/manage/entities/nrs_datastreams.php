@@ -134,7 +134,7 @@
 
 										<td class="col-4">
 												<ul>
-													<li class="none-separator"><a href="#add" onClick="fillFields('<?php echo(rawurlencode($nrs_datastream_id)); ?>','<?php echo(rawurlencode($nrs_datastream_title)); ?>','<?php echo(rawurlencode($nrs_datastream_unit_label)); ?>','<?php echo(rawurlencode($nrs_datastream_unit_type)); ?>','<?php echo(rawurlencode($nrs_datastream_unit_symbol)); ?>','<?php echo(rawurlencode($nrs_datastream_unit_format)); ?>','<?php echo(rawurlencode($nrs_env_uid)); ?>','<?php echo(rawurlencode($nrs_only_node_uid)); ?>','<?php echo(rawurlencode($nrs_only_datastream_uid)); ?>','<?php echo(rawurlencode($nrs_datastream->tags)); ?>','<?php echo(rawurlencode($nrs_datastream->current_value)); ?>','<?php echo(rawurlencode($nrs_datastream->min_value)); ?>','<?php echo(rawurlencode($nrs_datastream->max_value)); ?>','<?php echo(rawurlencode($nrs_datastream->nrs_environment_id)); ?>','<?php echo(rawurlencode($nrs_datastream->nrs_node_id)); ?>')"><?php echo Kohana::lang('ui_main.edit');?></a></li>
+													<li class="none-separator"><a href="#add" onClick="fillFields('<?php echo(rawurlencode($nrs_datastream_id)); ?>','<?php echo(rawurlencode($nrs_datastream_title)); ?>','<?php echo(rawurlencode($nrs_datastream_unit_label)); ?>','<?php echo(rawurlencode($nrs_datastream_unit_type)); ?>','<?php echo(rawurlencode($nrs_datastream_unit_symbol)); ?>','<?php echo(rawurlencode($nrs_datastream_unit_format)); ?>','<?php echo(rawurlencode($nrs_env_uid)); ?>','<?php echo(rawurlencode($nrs_only_node_uid)); ?>','<?php echo(rawurlencode($nrs_only_datastream_uid)); ?>','<?php echo(rawurlencode($nrs_datastream->tags)); ?>','<?php echo(rawurlencode($nrs_datastream->current_value)); ?>','<?php echo(rawurlencode($nrs_datastream->min_value)); ?>','<?php echo(rawurlencode($nrs_datastream->max_value)); ?>','<?php echo(rawurlencode($nrs_datastream->nrs_environment_id)); ?>','<?php echo(rawurlencode($nrs_datastream->nrs_node_id)); ?>','<?php echo(rawurlencode($nrs_datastream->samples_num)); ?>','<?php echo(rawurlencode($nrs_datastream->factor_title)); ?>','<?php echo(rawurlencode($nrs_datastream->factor_value)); ?>','<?php echo(rawurlencode($nrs_datastream->lambda_value)); ?>','<?php echo(rawurlencode($nrs_datastream->constant_value)); ?>')"><?php echo Kohana::lang('ui_main.edit');?></a></li>
 													<li class="none-separator">
 													<?php if($nrs_datastream_active==1 || $nrs_datastream_active==2) {?>
 													<a href="javascript:datastreamAction('h','HIDE',<?php echo rawurlencode($nrs_datastream_id);?>)" class="status_yes"><?php echo ($nrs_datastream_active==2? Kohana::lang('nrs.env_status_2') : Kohana::lang('nrs.env_status_1') );?></a>
@@ -224,6 +224,28 @@
 							<strong><?php echo Kohana::lang('nrs.max_value');?>:</strong><br />
 							<?php print form::input('max_value', '', ' class="text"'); ?>
 						</div>
+						<div class="tab_form_item">
+							<strong><?php echo Kohana::lang('nrs.samples_num');?>:</strong><br />
+							<?php print form::input('samples_num', '', ' class="text"'); ?>
+						</div>
+						<div style="clear:both"></div>
+						<div class="tab_form_item">
+							<strong><?php echo Kohana::lang('nrs.factor_title');?>:</strong><br />
+							<?php print form::input('factor_title', '', ' class="text"'); ?>
+						</div>
+						<div class="tab_form_item">
+							<strong><?php echo Kohana::lang('nrs.factor_value');?>:</strong><br />
+							<?php print form::input('factor_value', '', ' class="text"'); ?>
+						</div>
+						<div class="tab_form_item">
+							<strong><?php echo Kohana::lang('nrs.lambda_value');?>:</strong><br />
+							<?php print form::input('lambda_value', '', ' class="text"'); ?>
+						</div>
+						<div class="tab_form_item">
+							<strong><?php echo Kohana::lang('nrs.constant_value');?>:</strong><br />
+							<?php print form::input('constant_value', '', ' class="text"'); ?>
+						</div>
+						<div style="clear:both"></div>
 						<div class="tab_form_item">
 							<strong><?php echo Kohana::lang('nrs.tags');?>:</strong><br />
 							<?php print form::input('tags', '', ' class="text long"'); ?>

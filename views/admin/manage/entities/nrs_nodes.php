@@ -121,6 +121,8 @@
 									}									
 									
 									$datastreams_count = ORM::factory('nrs_datastream')->where('nrs_node_id',$nrs_node->id)->count_all();
+									$datapoint_count = ORM::factory('nrs_datapoint')->where('nrs_node_id',$nrs_node->id)->count_all();
+
 									?>
 									<tr>
 										<td class="col-1"><input name="nrs_node_id[]" value="<?php echo $nrs_node_id; ?>" type="checkbox" class="check-box"/></td>
@@ -131,6 +133,7 @@
 												<p><a href="javascript:preview('message_preview_<?php echo $nrs_node_id?>')"><?php echo Kohana::lang('nrs.preview_description'). ' '. Kohana::lang('nrs.node') .' with uid='.$nrs_node_uid;?></a></p>
 												<div id="message_preview_<?php echo $nrs_node_id?>" style="display:none;">
 													<?php echo $nrs_node_description; ?>
+													<?php if($datapoint_count>0) { ?><div id="visualization_<?php echo $nrs_node_id?>" style="width: 500px; height: 400px;"></div><?php } else { echo '<p class="status_no">'. Kohana::lang('nrs.NO_DATAPOINTS').'</p>'; } ?> 
 												</div>
 											</div>
 											<ul class="info">
