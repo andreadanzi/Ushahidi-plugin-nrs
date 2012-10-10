@@ -40,12 +40,15 @@ class GibeToNrsThread(threading.Thread):
 	      nrs_node_id = self.check_node_uid(self.nrs_environment_id, self.env_uid+node_uid)
 	      bulk_insert_row = []
 	      datastream_uids = {}
-	      sample=1
+	      sample=1      
+              i=0
+	      sUpdated = time.strftime('%Y-%m-%d %H:%M:%S')
 	      with open(self.csv_folder+"/"+files, 'rb') as csvfile:
-		csv_reader = csv.reader(csvfile, delimiter='\t')
+		csv_reader = csv.reader(csvfile, delimiter='\t')  
 		for row in csv_reader:
 		  #self.logger.info("thread on %s reads CSV sample number %d" % (self.csv_folder,sample) )
 		  icol=0
+		  isensor=1
 		  ds_prefix="_%02d."
 		  ds_prefix_no = 1
 		  sAt=""
@@ -67,30 +70,46 @@ class GibeToNrsThread(threading.Thread):
 		      first_part_slast_value = slast_value.split('.')[0]
 		      if int(first_part_slast_value) >= int(first_part_current_value):
 		         ds_prefix_no = ds_prefix_no+1
+                         isensor = 1
 		      prefix = ds_prefix % ds_prefix_no
 		      #datastream_uid = prefix + first_part_current_value
-                      datastream_uid = prefix + "%02d" % (icol-2)
+                      datastream_uid = prefix + "%02d" % (isensor)
 		      if sample==1:
 		        nrs_datastream_id = self.check_datastream_uid(self.nrs_environment_id,nrs_node_id,self.env_uid+node_uid+datastream_uid)
 		        datastream_uids[icol]=nrs_datastream_id
 		      else:
 		        nrs_datastream_id = datastream_uids[icol]
-		      bulk_insert_row.append({'sample':sample,'at':sAt,'env_id':self.nrs_environment_id,'node_id':nrs_node_id,'datastream_id':nrs_datastream_id,'value_at':current_value})
+		      bulk_insert_row.append((self.nrs_environment_id, nrs_node_id,nrs_datastream_id,sample,current_value,sAt,sUpdated  ))
+		      i=i+1
+                      isensor = isensor + 1
 		      slast_value = current_value
-		  sample=sample+1	      
-	      sUpdated = time.strftime('%Y-%m-%d %H:%M:%S')
-	      i=0
-	      for item in bulk_insert_row:
-		#if i>0 :
-		#  sQuery = sQuery + ","
-		sQuery = "INSERT INTO nrs_datapoint (nrs_environment_id, nrs_node_id, nrs_datastream_id, sample_no, value_at, datetime_at, updated) VALUES "
-		sQuery = sQuery + "(%d,%d,%d,%d,%s,'%s','%s');" % (item['env_id'],item['node_id'],item['datastream_id'],item['sample'],item['value_at'],item['at'],sUpdated)
-		retVal = self.sql_insert_datapoint_value( sQuery )
-		i=i+1
-	      #sQuery = sQuery + ";"
+		  sample=sample+1
+              self.logger.info("bulk_insert_row is ready with %d samples and %d rows" % (sample,i))
+              if not os.path.exists(self.csv_folder+"/tmp"):
+                os.mkdir(self.csv_folder+"/tmp")
+	      csv_file = time.strftime('%Y%m%d%H%M%S')
+              with open(self.csv_folder+"/tmp/" + csv_file + ".csv", 'wb') as importcsvfile:
+                writer = csv.writer(importcsvfile,delimiter='|')
+                writer.writerows(bulk_insert_row)
+              self.logger.info("File %s written" % (self.csv_folder+"/tmp/" + csv_file + ".csv"))
+              sQuery = """LOAD DATA INFILE '%s' 
+                          INTO TABLE nrs_datapoint 
+                          FIELDS TERMINATED BY '|' 
+                          LINES TERMINATED BY '\r\n' 
+                          ( 
+                             nrs_environment_id, 
+                             nrs_node_id, 
+                             nrs_datastream_id, 
+                             sample_no, 
+                             value_at, 
+                             datetime_at, 
+                             updated
+                          );""" % (self.csv_folder+"/tmp/" + csv_file + ".csv")
 	      #self.logger.info("sQuery = %s" % sQuery)
+              retVal = self.sql_execute( sQuery )
 	      saved_folder = time.strftime('%Y%m%d%H%M')
-	      os.mkdir(self.csv_folder+"/"+saved_folder)
+              if not os.path.exists(self.csv_folder+"/"+saved_folder):
+	        os.mkdir(self.csv_folder+"/"+saved_folder)
 	      shutil.move(self.csv_folder+"/"+files,self.csv_folder+"/"+saved_folder)
 	      self.logger.info("thread on %s moved file %s into %s" % (self.csv_folder,files,saved_folder) )
 	      mysql_conn = MySQLdb.connect(host=settings.hostname, port=settings.portnumber, user=settings.username,passwd=settings.password,db=settings.database)
@@ -176,7 +195,7 @@ class GibeToNrsThread(threading.Thread):
     mysql_conn.close()
     return return_value
 
-  def sql_insert_datapoint_value(self, sQuery):
+  def sql_execute(self, sQuery):
     retVal = 0
     mysql_conn = MySQLdb.connect(host=settings.hostname, port=settings.portnumber, user=settings.username,passwd=settings.password,db=settings.database)
     mysql_cur = mysql_conn.cursor()
