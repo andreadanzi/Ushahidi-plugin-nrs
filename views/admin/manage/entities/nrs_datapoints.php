@@ -62,7 +62,11 @@
 					<input type="hidden" name="action" id="action" value="">
 					<input type="hidden" name="nrs_datapoint_id"  id="nrs_datapoint_id_action"  value="">
 					<div class="table-holder">
-						<div id='chart_div' style='width: 700px; height: 240px;'><strong>NO DATA AVAILABLE - DATASTREAM NEEDED</strong></div>
+
+						<div id="nrs_dashboard">
+							<div id='slider_div' class="nrs_slider"></div>
+							<div id='chart_div' class="nrs_chart"><strong>NO DATA AVAILABLE - DATASTREAM NEEDED</strong></div>
+						<div>
 					</div>
 
 				<?php print form::close(); ?>

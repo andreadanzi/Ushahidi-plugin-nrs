@@ -42,3 +42,14 @@ input.uid {
 .search-nrs-btn:hover {
 	cursor:pointer;
 }
+
+.nrs_chart {
+	width: 740px; 
+	height: 440px;
+	margin: 0 0 0 2px;
+}
+
+.nrs_slider {
+	width: 440px;
+	margin: 0 0 0 90px;
+}

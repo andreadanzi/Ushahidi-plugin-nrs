@@ -17,7 +17,7 @@
 ?>
 <?php if(isset($nrs_parent_datastream) && isset($nrs_datapoints)) { ?>
 google.setOnLoadCallback(drawChart);
-
+google.load('visualization', '1.1', {packages: ['controls']});
 
 function drawChart() {
   
@@ -25,8 +25,10 @@ function drawChart() {
 
 	['At', '<?php echo $nrs_parent_datastream->unit_label;?>(<?php echo $nrs_parent_datastream->unit_symbol;?>)', 'AVG']
 	<?php
+		$sampleno=0;
 		foreach ($nrs_datapoints as $nrs_datapoint)
 		{
+		  $sampleno++;
                   $value_at = $nrs_datapoint->value_at;
                   $datetime_at = $nrs_datapoint->datetime_at;
 		  $date = DateTime::createFromFormat("YmdHisu",$datetime_at);
@@ -37,19 +39,37 @@ function drawChart() {
                   }
 
 	?>   
-          ,['<?php echo $formtatted_date_js;?>',  <?php echo $value_at;?>,  <?php echo $avg;?>]
+          ,[<?php echo $sampleno;?>,  <?php echo $value_at;?>,  <?php echo $avg;?>]
 
 	<?php	
 		}
 	?>
         ]);
 	var options = {
-          title: '<?php echo $nrs_parent_datastream->title;?>'
+ 	  chartType: 'LineChart',
+          title: '<?php echo $nrs_parent_datastream->title;?>',
+          containerId: 'chart_div'
         };
 
+	// Define a NumberRangeFilter slider control for the 'Age' column.
+	var slider = new google.visualization.ControlWrapper({
+		'controlType': 'NumberRangeFilter',
+		'containerId': 'slider_div',
+		'options': {
+		'filterColumnLabel': 'At',
+		'minValue': 0,
+		'maxValue': <?php echo $sampleno;?>
+		}
+	});
 
-	var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-        chart.draw(data, options);
+	var chart = new google.visualization.ChartWrapper(options);
+        
+	// Create the dashboard.
+        var dashboard = new google.visualization.Dashboard(document.getElementById('nrs_dashboard')).
+	// Configure the slider to affect the bar chart
+	bind(slider, chart).
+	// Draw the dashboard
+	draw(data);
 
 }
 
