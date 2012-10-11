@@ -3,6 +3,8 @@
 import os, sys, threading, mosquitto, MySQLdb, logging, re, csv, hashlib, time, shutil
 import settings
 
+from datetime import datetime
+
 class GibeToNrsThread(threading.Thread):
   def __init__(self,e_uid,n_uid, csv_folder,logger):
     threading.Thread.__init__(self)
@@ -61,8 +63,10 @@ class GibeToNrsThread(threading.Thread):
 		    elif icol==2:
 		      # time
 		      stime = "%s" % col
-		      dt=time.strptime(sdate + " " +stime,"%d/%m/%Y %H:%M:%S")
-	      	      sAt = time.strftime('%Y%m%d%H%M%S000000',dt)           
+                      if len(stime)==8:
+                        stime = stime + ".000"
+		      dt=datetime.strptime(sdate + " " +stime,"%d/%m/%Y %H:%M:%S.%f")
+	      	      sAt = dt.strftime('%Y%m%d%H%M%S%f')           
 		    elif icol > 2:
 		      current_value = "%s" % col
 		      current_value = current_value.replace(',','.')

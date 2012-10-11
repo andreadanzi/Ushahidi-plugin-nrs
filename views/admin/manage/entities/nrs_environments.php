@@ -126,7 +126,7 @@
 									<tr>
 										<td class="col-1"><input name="nrs_environment_id[]" value="<?php echo $nrs_environment_id; ?>" type="checkbox" class="check-box"/></td>
 										<td class="col-2">
-											<div class="post">
+											<div class="nrspost">
 
 												<h4><a href="<?php echo url::site() . 'admin/manage/nrs_environments/edit/' . $nrs_environment_id; ?>" class="more"><?php echo $nrs_environment_title; ?></a>&nbsp;&nbsp;&nbsp;[<a href="<?php echo url::base() . 'admin/manage/nrs_nodes/environment/'.$nrs_environment_id ?>"><?php echo  "#".$nodes_count ." ". Kohana::lang('nrs.nodes');?></a>]</h4>
 												<p><a href="javascript:preview('message_preview_<?php echo $nrs_environment_id?>')"><?php echo Kohana::lang('nrs.preview_description') . ' '.Kohana::lang('nrs.environment').' with uid='.$nrs_environment_uid;?></a></p>

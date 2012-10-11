@@ -123,7 +123,7 @@
 									<tr>
 										<td class="col-1"><input name="nrs_datastream_id[]" value="<?php echo $nrs_datastream_id; ?>" type="checkbox" class="check-box"/></td>
 										<td class="col-2">
-											<div class="post">
+											<div class="nrspost">
 
 												<h4><a href="<?php echo url::site() . 'admin/manage/nrs_datastreams/edit/' . $nrs_datastream_id; ?>" class="more"><?php echo $nrs_datastream_title; ?></a>&nbsp;&nbsp;&nbsp;[<a href="<?php echo url::base() . 'admin/manage/nrs_datapoints/datastream/'.$nrs_datastream_id ?>"><?php echo  "#".$datapoint_count ." ". Kohana::lang('nrs.datapoints');?></a>]</h4>
 												<p><a href="javascript:preview('message_preview_<?php echo $nrs_datastream_id?>')"><?php echo Kohana::lang('nrs.preview_description'). ' '. Kohana::lang('nrs.datastream') .' with uid='.$nrs_datastream_uid;?></a></p>
@@ -134,7 +134,7 @@
 											</div>
 											<ul class="info">
 												<li class="none-separator">Node: <strong><a href="<?php echo url::site() . 'admin/manage/nrs_nodes?nrs_id=' . $nrs_node->id; ?>"><?php echo $nrs_node->title;?></a></strong></li>
-<li><?php echo Kohana::lang('ui_main.geolocation_available');?>?: <strong><a href="<?php echo url::site() . 'admin/manage/nrs_environments/id/' . $nrs_environment->id; ?>"><?php echo ($nrs_environment->location->id) ? utf8::strtoupper(Kohana::lang('ui_main.yes')). " - ".$nrs_environment->location->location_name : utf8::strtoupper(Kohana::lang('ui_main.no'));?></a></strong></li>
+<li><?php echo Kohana::lang('ui_main.geolocation_available');?>?: <strong><a href="<?php echo url::site() . 'admin/manage/nrs_environments/id/' . $nrs_environment->id; ?>"><?php echo ($nrs_environment->location->id) ? utf8::strtoupper(Kohana::lang('ui_main.yes')). " - ".$nrs_environment->location->location_name : utf8::strtoupper(Kohana::lang('ui_main.no')). " - ".$nrs_environment->title;?></a></strong></li>
 											</ul>
 										</td>
 										<td class="col-3"><?php echo $nrs_datastream_date; ?></td>

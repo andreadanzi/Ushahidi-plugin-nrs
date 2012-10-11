@@ -10,4 +10,4 @@ logfile_path="/home/andrea/Documents/nrs/dev/src/Ushahidi-plugin-nrs/libraries/p
 gibepidfile_path="/home/andrea/Documents/nrs/dev/src/Ushahidi-plugin-nrs/libraries/pyMQTT/GibeNRSApp.pid"
 gibelogfile_path="/home/andrea/Documents/nrs/dev/src/Ushahidi-plugin-nrs/libraries/pyMQTT/GibeNRSApp.log"
 gibeimportfolder_path="/home/andrea/Documents/nrs/dev/src/Ushahidi-plugin-nrs/libraries/pyMQTT/data"
-environment_uid="001"
+environment_uid="459"
