@@ -38,6 +38,17 @@ class Nrs_Controller extends Admin_Controller
 			'mqtt_username' => '',
 			'mqtt_password' => ''
 		);
+		// SQL filter
+		$filter = "1=1";
+
+		if (!empty($_GET['list_filter']))
+		{
+			$list_filter = $_GET['list_filter']; // SQL filter for the id
+			$filter .= " AND ( mqtt_subscription_name LIKE '%" . $list_filter . "%' OR mqtt_subscription_name LIKE '%" . strtoupper($list_filter) . "%' OR  mqtt_subscription_name LIKE '%" . strtolower($list_filter) . "%' OR mqtt_subscription_topic LIKE '%" . $list_filter . "%' OR mqtt_subscription_topic LIKE '%" . strtoupper($list_filter) . "%' OR  mqtt_subscription_topic LIKE '%" . strtolower($list_filter) . "%' OR  mqtt_subscription_id LIKE '%" . $list_filter . "%' OR mqtt_subscription_id LIKE '%" . strtoupper($list_filter) . "%' OR mqtt_subscription_id LIKE '%" . strtolower($list_filter) . "%' ) ";			
+		}
+
+		
+
 		//	copy the form as errors, so the errors will be stored with keys corresponding to the form field names
 		$errors = $form;
 		$form_error = FALSE;
@@ -143,12 +154,15 @@ class Nrs_Controller extends Admin_Controller
 		$pagination = new Pagination(array(
 			'query_string' => 'page',
 			'items_per_page' => $this->items_per_page,
-			'total_items'	 => ORM::factory('nrs_mqtt_subscription')->count_all()
+			'total_items'	 => ORM::factory('nrs_mqtt_subscription')
+										->where($filter)
+										->count_all()
 		));
 
 		$nrs_mqtt_subscriptions = ORM::factory('nrs_mqtt_subscription')
-					->orderby('mqtt_subscription_name', 'asc')
-					->find_all($this->items_per_page, $pagination->sql_offset);
+										->where($filter)
+										->orderby('mqtt_subscription_name', 'asc')
+										->find_all($this->items_per_page, $pagination->sql_offset);
 
 		$this->template->content->form_error = $form_error;
 		$this->template->content->form_saved = $form_saved;
@@ -175,6 +189,17 @@ class Nrs_Controller extends Admin_Controller
 		$filter = (isset($nrs_mqtt_subscription_id)  AND !empty($nrs_mqtt_subscription_id))
 					? " nrs_mqtt_subscription_id = '" . $nrs_mqtt_subscription_id . "' "
 					: " 1=1";
+
+
+
+
+		if (!empty($_GET['list_filter']))
+		{
+			$list_filter = $_GET['list_filter']; // SQL filter for the id
+			$filter .= " AND ( mqtt_topic LIKE '%" . $list_filter . "%' OR mqtt_topic LIKE '%" . strtoupper($list_filter) . "%' OR  mqtt_topic LIKE '%" . strtolower($list_filter) . "%' OR mqtt_payload LIKE '%" . $list_filter . "%' OR mqtt_payload LIKE '%" . strtoupper($list_filter) . "%' OR  mqtt_payload LIKE '%" . strtolower($list_filter) . "%' OR  nrs_entity_uid LIKE '%" . $list_filter . "%' OR nrs_entity_uid LIKE '%" . strtoupper($list_filter) . "%' OR nrs_entity_uid LIKE '%" . strtolower($list_filter) . "%' ) ";			
+		}
+
+
 
 		$form_error = FALSE;
 		$form_saved = FALSE;

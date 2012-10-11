@@ -15,16 +15,14 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL) 
  */
 ?>
-/*
-
-<?php print_r($nrs_datapoints ); ?>
-*/
 
 
 function drawVisualization() {
 	var data = null;
 	 // Create and populate the data table.
 	<?php	
+        if(!empty($nrs_datapoints))
+        {
 	foreach ($nrs_datapoints["head"] as $key=>$nrs_datastreams)
 	{
 		$nrs_node_id = $key;
@@ -72,7 +70,8 @@ function drawVisualization() {
                         width: 500, height: 400}
                 );
 	<?php	
-	}
+	} // END foreach ($nrs_datapoints
+	} // END IF NOT EMPTY
 	?>
 }
 

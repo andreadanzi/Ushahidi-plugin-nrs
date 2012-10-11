@@ -43,6 +43,16 @@ class Nrs_nodes_Controller extends Admin_Controller
 			$id = $_GET['nrs_id'];
 			$filter .= " AND id = " . $id . " ";
 		}
+
+		if (!empty($_GET['list_filter']))
+		{
+			$list_filter = $_GET['list_filter']; // SQL filter for the id
+			$filter .= " AND ( title LIKE '%" . $list_filter . "%' OR title LIKE '%" . strtoupper($list_filter) . "%' OR  title LIKE '%" . strtolower($list_filter) . "%' OR description LIKE '%" . $list_filter . "%' OR description LIKE '%" . strtoupper($list_filter) . "%' OR  description LIKE '%" . strtolower($list_filter) . "%' OR  node_uid LIKE '%" . $list_filter . "%' OR node_uid LIKE '%" . strtoupper($list_filter) . "%' OR node_uid LIKE '%" . strtolower($list_filter) . "%' OR node_disposition LIKE '%" . $list_filter . "%' OR node_disposition LIKE '%" . strtoupper($list_filter) . "%' OR node_disposition LIKE '%" . strtolower($list_filter) . "%'  OR node_exposure LIKE '%" . $list_filter . "%' OR node_exposure LIKE '%" . strtoupper($list_filter) . "%' OR node_exposure LIKE '%" . strtolower($list_filter) . "%' ) ";			
+		}
+
+
+
+
 		$form_error = FALSE;
 		$form_saved = FALSE;
 		$form_action = "";
@@ -166,8 +176,8 @@ class Nrs_nodes_Controller extends Admin_Controller
 
 		$this->template->content->total_items = $pagination->total_items;
 		$this->template->js = new View('admin/manage/entities/nrs_nodes_js');
-		$this->template->js->nrs_nodes = $nrs_nodes;
-		$this->template->js->nrs_datapoints = $this->_datapoints_array();
+
+		$this->template->js->nrs_datapoints = $this->_datapoints_array($filter);
 	
 	}
 
@@ -215,7 +225,7 @@ class Nrs_nodes_Controller extends Admin_Controller
 		return $environment_array;
 	}
 	// Function _datapoints_array
-	private function _datapoints_array()
+	private function _datapoints_array($filter)
 	{
 		if ( !empty($_GET['nrs_id']))
 		{
@@ -223,7 +233,9 @@ class Nrs_nodes_Controller extends Admin_Controller
 			$orm_nodes = ORM::factory('nrs_node')->where('id',$id)->find_all();
 		}	
 		else {			
-			$orm_nodes = ORM::factory('nrs_node')->find_all();
+			$orm_nodes = ORM::factory('nrs_node')
+							->where($filter)
+                                                        ->find_all();
 		}
 		$datapoints_array = array();
 		foreach($orm_nodes as $node)

@@ -30,9 +30,13 @@
 						<li><a href="<?php echo url::site() . 'admin/manage/nrs_datapoints' ?>"><?php echo Kohana::lang('nrs.datapoints');?></a></li>
 					</ul>
 				
-					<!-- tab -->
+					<!-- search tab -->
 					<div class="tab">
-						&nbsp;
+					<?php print form::open(NULL, array('id' => 'nrs_mqtt_messageSearch', 'name' => 'nrs_mqtt_messageSearch','method'=>'get')); ?>
+						<div class="tab_form_item"><?php print form::input('list_filter', (!empty($_GET['list_filter'])? $_GET['list_filter'] : ''), ' class="text"'); ?></div>
+						<div class="tab_form_item"><input type="submit" class="search-nrs-btn" value="<?php echo Kohana::lang('ui_main.search');?>" /></div>
+					<?php print form::close(); ?>
+
 					</div>
 				</div>
 				

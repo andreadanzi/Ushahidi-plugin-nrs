@@ -33,7 +33,8 @@ function drawVisualization() {
 		$nrs_datapoints_count = ORM::factory('nrs_datapoint')
 						->where('nrs_datastream_id',$nrs_datastream_id)
 						->count_all();
-		if($nrs_datapoints_count<$max_number) $max_number = $nrs_datapoints_count;
+		$tot4avg=$nrs_datapoints_count;
+		if($nrs_datapoints_count<$max_number) $nrs_datapoints_count = $max_number;
 		$nrs_datapoints = ORM::factory('nrs_datapoint')
 						->where('nrs_datastream_id',$nrs_datastream_id)
 						->orderby('datetime_at','asc')
@@ -48,7 +49,7 @@ function drawVisualization() {
                   }
                   $avg = $avg + $value_at;
 		}
-		$avg=$avg/$max_number;
+		$avg=($tot4avg != 0 ? $avg/$tot4avg : 0);
 		foreach ($nrs_datapoints as $nrs_datapoint)
 		{
                   $value_at = $nrs_datapoint->value_at;

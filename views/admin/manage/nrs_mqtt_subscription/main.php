@@ -32,9 +32,13 @@
 					
 					<!-- tab -->
 					<div class="tab">
-						<ul>
-							<li><a href="javascript:refreshSubscriptions();"><?php echo Kohana::lang('nrs.NRS_refresh_mqtt_deployments');?></a></li><span id="mqtt_deployments_loading"></span>
-						</ul>
+					<div class="tab_form_item">
+						<a class="search-nrs-btn" href="javascript:refreshSubscriptions();"><?php echo Kohana::lang('nrs.NRS_refresh_mqtt_deployments');?></a><span id="mqtt_deployments_loading"></span>
+					</div>
+					<?php print form::open(NULL, array('id' => 'nrs_mqtt_subscriptionSearch', 'name' => 'nrs_mqtt_subscriptionSearch','method'=>'get')); ?>
+						<div class="tab_form_item"><?php print form::input('list_filter', (!empty($_GET['list_filter'])? $_GET['list_filter'] : ''), ' class="text"'); ?></div>
+						<div class="tab_form_item"><input type="submit" class="search-nrs-btn" value="<?php echo Kohana::lang('ui_main.search');?>" /></div>
+					<?php print form::close(); ?>
 					</div>
 				</div>
 

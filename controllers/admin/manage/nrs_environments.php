@@ -39,6 +39,14 @@ class Nrs_environments_Controller extends Admin_Controller
 					? " id = '" . $nrs_entity_id . "' "
 					: " 1=1";
 
+
+		if (!empty($_GET['list_filter']))
+		{
+			$list_filter = $_GET['list_filter']; // SQL filter for the id
+			$filter .= " AND ( title LIKE '%" . $list_filter . "%' OR title LIKE '%" . strtoupper($list_filter) . "%' OR  title LIKE '%" . strtolower($list_filter) . "%' OR description LIKE '%" . $list_filter . "%' OR description LIKE '%" . strtoupper($list_filter) . "%' OR  description LIKE '%" . strtolower($list_filter) . "%' OR  environment_uid LIKE '%" . $list_filter . "%' OR environment_uid LIKE '%" . strtoupper($list_filter) . "%' OR environment_uid LIKE '%" . strtolower($list_filter) . "%' OR location_disposition LIKE '%" . $list_filter . "%' OR location_disposition LIKE '%" . strtoupper($list_filter) . "%' OR location_disposition LIKE '%" . strtolower($list_filter) . "%'  OR location_exposure LIKE '%" . $list_filter . "%' OR location_exposure LIKE '%" . strtoupper($list_filter) . "%' OR location_exposure LIKE '%" . strtolower($list_filter) . "%' OR location_name LIKE '%" . $list_filter . "%' OR location_name LIKE '%" . strtoupper($list_filter) . "%' OR location_name LIKE '%" . strtolower($list_filter) . "%' ) ";			
+		}
+
+
 		$form_error = FALSE;
 		$form_saved = FALSE;
 		$form_action = "";

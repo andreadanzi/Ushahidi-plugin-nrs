@@ -44,6 +44,12 @@ class Nrs_datastreams_Controller extends Admin_Controller
 			$id = $_GET['nrs_id']; // SQL filter for the id
 			$filter .= " AND id = " . $id . " ";
 		}
+
+		if (!empty($_GET['list_filter']))
+		{
+			$list_filter = $_GET['list_filter']; // SQL filter for the id
+			$filter .= " AND ( title LIKE '%" . $list_filter . "%' OR title LIKE '%" . strtoupper($list_filter) . "%' OR  title LIKE '%" . strtolower($list_filter) . "%' OR  unit_label LIKE '%" . $list_filter . "%' OR unit_label LIKE '%" . strtoupper($list_filter) . "%' OR  unit_label LIKE '%" . strtolower($list_filter) . "%' OR  unit_type LIKE '%" . $list_filter . "%' OR unit_type LIKE '%" . strtoupper($list_filter) . "%' OR  unit_type LIKE '%" . strtolower($list_filter) . "%' OR  factor_title LIKE '%" . $list_filter . "%' OR factor_title LIKE '%" . strtoupper($list_filter) . "%' OR factor_title LIKE '%" . strtolower($list_filter) . "%'  OR  tags LIKE '%" . $list_filter . "%' OR tags LIKE '%" . strtoupper($list_filter) . "%' OR tags LIKE '%" . strtolower($list_filter) . "%' OR  datastream_uid LIKE '%" . $list_filter . "%' OR datastream_uid LIKE '%" . strtoupper($list_filter) . "%' OR datastream_uid LIKE '%" . strtolower($list_filter) . "%') ";			
+		}
 		$form_error = FALSE;
 		$form_saved = FALSE;
 		$form_action = "";
