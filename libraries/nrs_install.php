@@ -147,11 +147,11 @@ class Nrs_Install {
 				unit_symbol varchar(100) DEFAULT NULL,
 				unit_format varchar(100) DEFAULT NULL,
 				tags text,
-				current_value float NOT NULL DEFAULT '0.0',
-				min_value float DEFAULT NULL,
-				max_value float DEFAULT NULL,
+				current_value decimal(10,6) DEFAULT NULL,
+				min_value decimal(10,6) DEFAULT NULL,
+				max_value decimal(10,6) DEFAULT NULL,
 				updated datetime DEFAULT NULL,
-				samples_num int(11)  NOT NULL DEFAULT '10',
+				samples_num int(11) DEFAULT '10',
 				factor_title varchar(100) DEFAULT NULL,
 				factor_value DECIMAL(10,6) NOT NULL DEFAULT '1.00',
 				lambda_value DECIMAL(10,6) NOT NULL DEFAULT '0.00',
@@ -190,6 +190,29 @@ class Nrs_Install {
 			);
 		");
 
+
+		$this->db->query("
+			CREATE VIEW IF NOT EXISTS `".Kohana::config('database.default.table_prefix')."nrs_overlimits` AS 
+				SELECT 
+				nrs_datapoint.nrs_environment_id,
+				nrs_datapoint.nrs_node_id,
+				nrs_datapoint.nrs_datastream_id,
+				nrs_datapoint.id as nrs_datapoint_id,
+				nrs_datapoint.sample_no,
+				constant_value + (nrs_datapoint.value_at - lambda_value)*factor_value AS calculated_value,
+				nrs_datastream.max_value,
+				nrs_datastream.min_value,
+				nrs_datapoint.datetime_at,
+				nrs_datapoint.updated
+				FROM nrs_datapoint, nrs_datastream 
+				WHERE 
+				nrs_datastream.id = nrs_datapoint.nrs_datastream_id AND (
+				constant_value + (nrs_datapoint.value_at - lambda_value)*factor_value <= nrs_datastream.min_value 
+				OR
+				constant_value + (nrs_datapoint.value_at - lambda_value)*factor_value >= nrs_datastream.max_value )
+				ORDER BY nrs_datapoint.nrs_datastream_id, nrs_datapoint.datetime_at, nrs_datapoint.updated, nrs_datapoint.sample_no;
+		");
+
 	}
 
 	/**
@@ -208,5 +231,6 @@ class Nrs_Install {
 		$this->db->query('DROP TABLE `'.Kohana::config('database.default.table_prefix').'nrs_mqtt_message`');
 		$this->db->query('DROP TABLE `'.Kohana::config('database.default.table_prefix').'nrs_mqtt_subscription`');
 		$this->db->query('DROP TABLE `'.Kohana::config('database.default.table_prefix').'nrs_csv_client`');
+		$this->db->query('DROP VIEW `'.Kohana::config('database.default.table_prefix').'nrs_overlimits`');
 	}
 }

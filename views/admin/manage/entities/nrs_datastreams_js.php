@@ -49,7 +49,7 @@ function drawVisualization() {
                   }
                   $avg = $avg + $value_at;
 		}
-		$avg=($tot4avg < $max_number ? ($tot4avg!=0? $avg/$tot4avg : 0) : $avg/$max_number);
+		if( $max_number!=0) $avg=($tot4avg < $max_number ? ($tot4avg!=0? $avg/$tot4avg : 0) : $avg/$max_number);
 		foreach ($nrs_datapoints as $nrs_datapoint)
 		{
                   $value_at = $nrs_datapoint->value_at;

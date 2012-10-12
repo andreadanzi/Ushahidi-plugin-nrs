@@ -173,6 +173,7 @@ class Nrs_environments_Controller extends Admin_Controller
 						->find_all($this->items_per_page, $pagination->sql_offset);
 
 		$this->template->content->nrs_environments = $nrs_environments;
+		$this->template->content->overlimits = $this->_check_overlimits();
 		$this->template->content->status_array = $this->_status_array();
 		$this->template->content->stroke_width_array = $this->_stroke_width_array();
 		$this->template->content->pagination = $pagination;
@@ -225,6 +226,24 @@ class Nrs_environments_Controller extends Admin_Controller
 		}
 		return $stroke_width_array;
 	}
+
+	private function _check_overlimits()
+	{
+		$sql_query = "SELECT count( * ) AS overlimits_no, CONVERT( sum( abs(
+				CASE WHEN calculated_value >= max_value
+				THEN calculated_value - max_value
+				ELSE min_value - calculated_value
+				END ) ) / sum( abs( max_value - min_value ) ) , DECIMAL( 10, 3 ) ) AS overlimits_weight, 
+				nrs_environment_id, nrs_node_id, nrs_datastream_id, updated
+				FROM nrs_overlimits
+				GROUP BY nrs_environment_id, nrs_node_id, nrs_datastream_id, updated
+				ORDER BY updated DESC , nrs_datastream_id ASC";
+		$overlimits=array();
+		$db_instance = Database::instance('default');
+		$overlimits_results = $db_instance->query($sql_query);
+		return $overlimits_results;
+	}
+
 }
 
 ?>

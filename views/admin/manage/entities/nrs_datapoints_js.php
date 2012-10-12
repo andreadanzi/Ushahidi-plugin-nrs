@@ -15,6 +15,15 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL) 
  */
 ?>
+
+// NRS datapoint JS
+function onChangeDatastream(elem)
+{
+	$("#nrs_updated").attr("value", '');
+	elem.form.submit();
+}
+
+
 <?php if(isset($nrs_parent_datastream) && isset($nrs_datapoints)) { ?>
 google.setOnLoadCallback(drawChart);
 google.load('visualization', '1.1', {packages: ['controls']});
@@ -22,8 +31,11 @@ google.load('visualization', '1.1', {packages: ['controls']});
 function drawChart() {
   
  	var data = new google.visualization.arrayToDataTable([
-
+	<?php if(isset($nrs_parent_datastream->max_value) && isset($nrs_parent_datastream->min_value)) {?>
+	['At', '<?php echo $nrs_parent_datastream->unit_label;?>(<?php echo $nrs_parent_datastream->unit_symbol;?>)', 'AVG','MIN','MAX']
+	<?php } else { ?>
 	['At', '<?php echo $nrs_parent_datastream->unit_label;?>(<?php echo $nrs_parent_datastream->unit_symbol;?>)', 'AVG']
+	<?php } ?>
 	<?php
 		$sampleno=0;
 		foreach ($nrs_datapoints as $nrs_datapoint)
@@ -39,8 +51,12 @@ function drawChart() {
                   }
 
 	?>   
+	
+	<?php if(isset($nrs_parent_datastream->max_value) && isset($nrs_parent_datastream->min_value)) {?>
+          ,[<?php echo $sampleno;?>,  <?php echo $value_at;?>,  <?php echo $avg;?>, <?php echo $nrs_parent_datastream->min_value;?>, <?php echo $nrs_parent_datastream->max_value;?>]
+	<?php } else { ?>
           ,[<?php echo $sampleno;?>,  <?php echo $value_at;?>,  <?php echo $avg;?>]
-
+	<?php } ?>
 	<?php	
 		}
 	?>

@@ -122,12 +122,12 @@ class Nrs_datastreams_Controller extends Admin_Controller
 					$nrs_datastream->unit_symbol = $post->unit_symbol;
 					$nrs_datastream->unit_format = $post->unit_format;
 					$nrs_datastream->tags = $post->tags;
-					$nrs_datastream->current_value = $post->current_value;
-					$nrs_datastream->min_value = $post->min_value;
-					$nrs_datastream->max_value = $post->max_value;
+					$nrs_datastream->current_value = (empty($post->current_value)? NULL: $post->current_value);
+					$nrs_datastream->min_value = (empty($post->min_value)? NULL: $post->min_value);
+					$nrs_datastream->max_value = (empty($post->max_value)? NULL: $post->max_value);
 					$nrs_datastream->nrs_environment_id = $post->nrs_environment_id;
 					$nrs_datastream->nrs_node_id = $post->nrs_node_id;
-					$nrs_datastream->samples_num = $post->samples_num;
+					$nrs_datastream->samples_num = (empty($post->samples_num)? NULL: $post->samples_num);
 					$nrs_datastream->factor_title = $post->factor_title;
 					$nrs_datastream->factor_value = $post->factor_value;
 					$nrs_datastream->lambda_value = $post->lambda_value;

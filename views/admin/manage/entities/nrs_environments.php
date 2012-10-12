@@ -97,6 +97,14 @@
 								foreach ($nrs_environments as $nrs_environment)
 								{
 									$nrs_environment_id = $nrs_environment->id;
+									$overlimit_string="";
+									foreach ($overlimits as $overlimit)
+									{
+										if($nrs_environment_id== $overlimit->nrs_environment_id)
+										{
+											$overlimit_string .= "<p>There are #".$overlimit->overlimits_no. " events with magnitude=".$overlimit->overlimits_weight. " please check <a href=". url::site() . "admin/manage/nrs_datapoints?nrs_datastream_id=".rawurlencode($overlimit->nrs_datastream_id)."&nrs_updated=".rawurlencode($overlimit->updated).">here</a></p>";
+										}
+									}
 									$nrs_environment_title = $nrs_environment->title;
 									$nrs_environment_active = $nrs_environment->active;
 									$nrs_environment_description = $nrs_environment->description;
@@ -131,7 +139,7 @@
 												<h4><a href="<?php echo url::site() . 'admin/manage/nrs_environments/edit/' . $nrs_environment_id; ?>" class="more"><?php echo $nrs_environment_title; ?></a>&nbsp;&nbsp;&nbsp;[<a href="<?php echo url::base() . 'admin/manage/nrs_nodes/environment/'.$nrs_environment_id ?>"><?php echo  "#".$nodes_count ." ". Kohana::lang('nrs.nodes');?></a>]</h4>
 												<p><a href="javascript:preview('message_preview_<?php echo $nrs_environment_id?>')"><?php echo Kohana::lang('nrs.preview_description') . ' '.Kohana::lang('nrs.environment').' with uid='.$nrs_environment_uid;?></a></p>
 												<div id="message_preview_<?php echo $nrs_environment_id?>" style="display:none;">
-													<?php echo $nrs_environment_description; ?>
+													<?php echo $nrs_environment_description . "<br/>".$overlimit_string; ?>
 												</div>
 											</div>
 											<ul class="info">

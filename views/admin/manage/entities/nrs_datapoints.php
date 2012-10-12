@@ -32,7 +32,18 @@
 				
 					<!-- tab -->
 					<div class="tab">
-						&nbsp;
+						<?php print form::open(NULL, array('id' => 'nrs_datapointSearch', 'name' => 'nrs_datapointSearch','method'=>'get')); ?>
+						<div class="tab_form_item">
+							<?php print '<span class="sel-holder">' . form::dropdown('nrs_datastream_id', $datastreams_array,(!empty($_GET['nrs_datastream_id'])? $_GET['nrs_datastream_id'] : ''),' onchange="onChangeDatastream(this);"') . '</span>'; ?></div>
+
+						<div class="tab_form_item">
+							<?php print '<span class="sel-holder">' . form::dropdown('nrs_updated', $distinct_updated_array,(!empty($_GET['nrs_updated'])? $_GET['nrs_updated'] : ''),' onchange="this.form.submit();"') . '</span>'; ?></div>
+						<!-- <div class="tab_form_item"><input type="submit" class="search-nrs-btn" value="<?php echo Kohana::lang('ui_main.search');?>" /></div> -->
+
+						<div class="tab_form_item">
+						<a class="search-nrs-btn" href="<?php echo url::site() . 'admin/manage/nrs_datastreams?nrs_id='.(!empty($_GET['nrs_datastream_id'])? $_GET['nrs_datastream_id'] : '') ?>"><?php echo "Go to the parent ". Kohana::lang('nrs.datastream');?></a>
+						</div>
+						<?php print form::close(); ?>
 					</div>
 				</div>
 				
