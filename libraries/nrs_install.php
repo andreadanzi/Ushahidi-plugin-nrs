@@ -203,7 +203,8 @@ class Nrs_Install {
 				nrs_datastream.max_value,
 				nrs_datastream.min_value,
 				nrs_datapoint.datetime_at,
-				nrs_datapoint.updated
+				nrs_datapoint.updated,
+				nrs_datastream.title
 				FROM nrs_datapoint, nrs_datastream 
 				WHERE 
 				nrs_datastream.id = nrs_datapoint.nrs_datastream_id AND (

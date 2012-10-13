@@ -28,6 +28,7 @@
 						<li><a href="<?php echo url::site() . 'admin/manage/nrs_nodes' ?>"><?php echo Kohana::lang('nrs.nodes');?></a></li>
 						<li><a href="<?php echo url::site() . 'admin/manage/nrs_datastreams' ?>" class="active"><?php echo Kohana::lang('nrs.datastreams');?></a></li>
 						<li><a href="<?php echo url::site() . 'admin/manage/nrs_datapoints' ?>"><?php echo Kohana::lang('nrs.datapoints');?></a></li>
+						<li><a href="<?php echo url::site() . 'admin/manage/nrs_overlimits' ?>"><?php echo Kohana::lang('nrs.overlimits');?></a></li>
 					</ul>
 				
 					<!-- search tab -->

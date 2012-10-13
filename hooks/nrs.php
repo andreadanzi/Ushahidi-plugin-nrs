@@ -35,7 +35,7 @@ class nrs {
 	public function add()
 	{
 		// Only add the events if we are on that controller
-		if (Router::$controller == 'manage' or Router::$controller == 'nrs' or Router::$controller == 'nrs_datapoints' or Router::$controller == 'nrs_datastreams' or Router::$controller == 'nrs_environments' or Router::$controller == 'nrs_nodes')
+		if (Router::$controller == 'manage' or Router::$controller == 'nrs' or Router::$controller == 'nrs_overlimits'or Router::$controller == 'nrs_datapoints' or Router::$controller == 'nrs_datastreams' or Router::$controller == 'nrs_environments' or Router::$controller == 'nrs_nodes')
 		{
 			Event::add('ushahidi_action.nav_admin_manage', array($this,'_nrs'));
 			Event::add('ushahidi_action.header_scripts_admin', array($this, 'nrs_css_admin'));

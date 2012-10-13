@@ -65,6 +65,7 @@
 	'max_value' => 'Max Value',
 	'min_value' => 'Min Value',
 	'NO_DATAPOINTS'=>'No datapoints available',
+	'overlimits'=>'Events',
 
 	);	
 ?>
