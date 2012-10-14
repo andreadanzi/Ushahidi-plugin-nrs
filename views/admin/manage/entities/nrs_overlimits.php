@@ -61,7 +61,7 @@
 				<!-- HERE THE FORM -->
 					<input type="hidden" name="action" id="action" value="">
 					<div class="table-holder">
-						<div id="visualization" style="width: 600px; height: 400px;"></div>
+						<div id="visualization" style="width: 800px; height: 400px;"></div>
 					</div>
 
 				<?php print form::close(); ?>

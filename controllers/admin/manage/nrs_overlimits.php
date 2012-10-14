@@ -95,8 +95,9 @@ class Nrs_overlimits_Controller extends Admin_Controller
 				THEN calculated_value - max_value
 				ELSE min_value - calculated_value
 				END ) ) / sum( abs( max_value - min_value ) ) , DECIMAL( 10, 3 ) ) AS overlimits_weight, 
-				nrs_environment_id, nrs_node_id, nrs_datastream_id, updated, title
-				FROM nrs_overlimits
+				nrs_environment_id, nrs_node_id, nrs_datastream_id, nrs_overlimits.updated, nrs_overlimits.title, nrs_environment.title as env_title
+				FROM nrs_overlimits, nrs_environment
+				WHERE nrs_environment.id = nrs_environment_id
 				GROUP BY nrs_environment_id, nrs_node_id, nrs_datastream_id, updated
 				ORDER BY updated DESC , nrs_datastream_id ASC";
 		$db_instance = Database::instance('default');

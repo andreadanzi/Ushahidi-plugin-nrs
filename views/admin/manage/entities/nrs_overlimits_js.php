@@ -26,12 +26,13 @@ google.setOnLoadCallback(drawVisualization);
 
 function drawVisualization() {
 	var data = google.visualization.arrayToDataTable([
-           ['ID', 'Events No', 'Magnitude',  'Date',    'Location']
+           ['Datastream',  'Timestamp', 'Events No', 'Site',    'Magnitude']
 	<?php
 	$ii=0;
 	foreach ($nrs_overlimits as $nrs_overlimit)
 	{
 		  $date = DateTime::createFromFormat("Y-m-d H:i:s",$nrs_overlimit->updated);
+		  $dateTimestamp =  date_timestamp_get($date);
                   $formtatted_date_js = "'" .$date->format("Y") . "'," .
                                         "'". $date->format("m"). "'," .
                                         "'". $date->format("d"). "'," .
@@ -39,29 +40,32 @@ function drawVisualization() {
                                         "'". $date->format("i"). "'," .
                                         "'". $date->format("s"). "'";
 	?>
-	,['<?php echo $nrs_overlimit->title;?>',  <?php echo $nrs_overlimit->overlimits_no;?>, <?php echo $nrs_overlimit->overlimits_weight;?>,'<?php echo  $nrs_overlimit->updated;?>',  <?php echo $nrs_overlimit->overlimits_weight;?>]
+	,['<?php echo $nrs_overlimit->title;?>',  <?php echo $dateTimestamp;?>,<?php echo $nrs_overlimit->overlimits_no;?>, '<?php echo  $nrs_overlimit->env_title;?>',  <?php echo $nrs_overlimit->overlimits_weight;?>]
 
 	<?php	
 		$ii++;
 	}
 	?>
 	]);
+
+
 	 var options = {
-	      title: 'Correlation between life Number of Events and Magnitude',
-	      hAxis: {title: 'Events No'},
-	      vAxis: {title: 'Magnitude'},
-	      bubble: {textStyle: {fontSize: 11}}
+	      title: 'Number of Events (Events No) and related Magnitude (diameter of the bubble)',
+	      hAxis: {title: 'Oldest Events <----------------------> Latest Events', textStyle:{fontSize: 6,color:'transparent'}},
+	      vAxis: {title: 'Events No'},
+	      bubble: {textStyle: {fontSize: 6,color:'transparent'}, opacity:0.90}
 	    };
 	var chart = new google.visualization.BubbleChart(document.getElementById('visualization'));
 
 	google.visualization.events.addListener(chart, 'select', function() {
-	   alert(chart.getSelection());
+	   selectChart(chart.getSelection(),data);
 	  });
     	chart.draw(data, options);
 }
 
-function selectChart() {
-	
+function selectChart(objectSelected,data) {
+	sObjectSelected = objectSelected[0];
+	alert("hei!");
 }
 
 <?php	
