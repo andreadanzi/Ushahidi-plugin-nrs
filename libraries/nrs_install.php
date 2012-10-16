@@ -110,7 +110,7 @@ class Nrs_Install {
 				location_latitude varchar(255) DEFAULT NULL,
 				location_longitude varchar(255) DEFAULT NULL,
 				location_elevation int(11) unsigned DEFAULT '0',
-
+				automatic_reports tinyint(4) NOT NULL DEFAULT 0,
 				person_first varchar(200) DEFAULT NULL,
 				person_last varchar(200) DEFAULT NULL,
 				person_email varchar(120) DEFAULT NULL,
@@ -230,6 +230,22 @@ class Nrs_Install {
 				UNIQUE KEY node_category_ids (nrs_node_id,category_id)
 			);
 		");
+
+
+		//Dump the NRS scheduler item from bundled SQL dump file
+		$this->db->query("DELETE FROM `".Kohana::config('database.default.table_prefix')."scheduler` where scheduler_name = 'Nrs' ");
+		$db_insert = fopen (dirname(dirname(__FILE__)).'/sql/s_nrs.sql', 'r');
+		$rows = fread ($db_insert, filesize(dirname(dirname(__FILE__)).'/sql/s_nrs.sql'));
+		
+		//split by ; to get the sql statement for inserting each row
+		$rows = explode(';\n',$rows);
+
+		foreach($rows as $query) 
+		{
+			$this->db->query($query);
+		}
+
+
 	}
 
 	/**
@@ -249,6 +265,6 @@ class Nrs_Install {
 		$this->db->query('DROP TABLE `'.Kohana::config('database.default.table_prefix').'nrs_mqtt_subscription`');
 		$this->db->query('DROP TABLE `'.Kohana::config('database.default.table_prefix').'nrs_csv_client`');
 		$this->db->query('DROP VIEW `'.Kohana::config('database.default.table_prefix').'nrs_overlimits`');
-		$this->db->query('DROP VIEW `'.Kohana::config('database.default.table_prefix').'nrs_node_category`');
+		$this->db->query('DROP TABLE `'.Kohana::config('database.default.table_prefix').'nrs_node_category`');
 	}
 }

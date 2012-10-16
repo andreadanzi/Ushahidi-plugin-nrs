@@ -142,6 +142,10 @@ class Nrs_environments_Controller extends Admin_Controller
 					$nrs_environment->location_elevation = $post->location_elevation;
 					$nrs_environment->feed = $post->feed;
 					$nrs_environment->updated = date("Y-m-d H:i:s",time());
+					if(isset($post->automatic_reports))
+					{
+						$nrs_environment->automatic_reports = $post->automatic_reports;
+					}
 					$nrs_environment->save();
 			
 					$form_saved = TRUE;

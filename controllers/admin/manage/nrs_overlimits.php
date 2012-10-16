@@ -79,116 +79,7 @@ class Nrs_overlimits_Controller extends Admin_Controller
 				// Generate Report Action
 				if ( $post->action == 'g' )
 				{
-					$nrs_datastream = new Nrs_datastream_Model($nrs_datastream_id);
-					// Yes! everything is valid
-					$location_id = $nrs_datastream->nrs_environment->location->id;
-					// STEP 1: SAVE LOCATION
-					$location = new Location_Model($location_id);
-
-					// STEP 2: SAVE INCIDENT
-					$incident = new Incident_Model(False);
-					$incident->incident_dateadd = date("Y-m-d H:i:s",time());
-					$incident->location_id = $location_id;
-					// Check if the user id has been specified
-					if ( ! $incident->loaded AND isset($_SESSION['auth_user']))
-					{
-						$incident->user_id = $_SESSION['auth_user']->id;
-					}
-					$incident->incident_title = $post->title;
-					$incident->incident_description = "Report Generated from " . $nrs_datastream->nrs_environment->title . ": ". $post->title . " at " . $post->updated_timestamp;
-					$incident->incident_date = $post->updated_timestamp;
-					$incident->incident_mode = 5; // NRS Service TO BE IMPLEMENTED
-
-					$incident->incident_active = 1;
-					$incident->incident_verified = 1;
-					$incident->incident_alert_status = 1;
-					$incident->save();
-
-					// STEP 2b: Record Approval/Verification Action
-					reports::verify_approve($incident);
-
-					// STEP 2c: SAVE INCIDENT GEOMETRIES
-					// reports::save_report_geometry($post, $incident);
-
-					// STEP 3: SAVE CATEGORIES...COLLEGATO AL NODO
-					// Delete Previous Entries
-
-					ORM::factory('incident_category')->where('incident_id', $incident->id)->delete_all();
-		
-					foreach ($nrs_datastream->nrs_node->nrs_node_category as $category)
-					{
-						$incident_category = new Incident_Category_Model();
-						$incident_category->incident_id = $incident->id;
-						$incident_category->category_id = $category->category_id;
-						$incident_category->save();
-					}
-
-					// STEP 4: SAVE MEDIA IMMAGINE DEL GRAFICO COLLEGATO A....
-					// reports::save_media($post, $incident);
-
-
-
-					$databary=$this->_get_bar_array($nrs_datastream_id,$updated_timestamp);
-					// New graph with a drop shadow
-					$graph = new Graph(600,400);
-					$graph->SetShadow();
-					// Use a "text" X-scale
-					$graph->SetScale("textlin");
-
-					$theme_class=new UniversalTheme;
-					$graph->SetTheme($theme_class);
-
-					$graph->SetBox(false);
-
-					$graph->ygrid->Show(true);
-					$graph->xgrid->Show(false);
-					$graph->yaxis->HideZeroLabel();
-					$graph->ygrid->SetFill(true,'#FFFFFF@0.5','#FFFFFF@0.5');
-					// $graph->SetBackgroundGradient('#0090DF', '#1FC4FF', GRAD_HOR, BGRAD_PLOT);
-
-					// Set title and subtitle
-					$graph->title->Set("NRS Events for Report ". $incident->incident_title );
-					if( isset($databary) && count($databary) < 20 ) {
-						$graph->xaxis->SetTickLabels($this->_get_label_array($nrs_datastream_id,$updated_timestamp));
-					}
-					else
-					{
-						$graph->xaxis->HideLabels();
-					}
-
-					// Create the line
-					$p1 = new LinePlot($databary);
-					$graph->Add($p1);
-
-					$p1->SetFillGradient('#AF0A0A','#6ADF45');
-					$p1->SetStepStyle();
-					$p1->SetColor('#808000');
-
-					$filename = Kohana::config('upload.directory', TRUE)."overlimits_".$nrs_datastream_id.".png";
-					$i = 1;
-					// Finally output the  image
-					$graph->Stroke($filename);
-
-					$this->_save_media($filename,$incident);
-
-
-					// STEP 5: SAVE PERSONAL INFORMATION
-					reports::save_personal_info($nrs_datastream->nrs_environment, $incident);
-
-					// STEP 6: update nrs_datapoint
-					
-					$table_prefix = Kohana::config('database.default.table_prefix');
-					if(isset($post->whole_node)) 
-					{
-						Database::instance()->query('UPDATE `'.$table_prefix.'nrs_datapoint` SET incident_id = ? WHERE nrs_node_id = ? AND updated = ?', $incident->id, $nrs_datastream->nrs_node_id, $updated_timestamp );
-						// In the case of WHOLE NODE.......we need to manage the incident properly...Description??
-					}
-					else {
-						Database::instance()->query('UPDATE `'.$table_prefix.'nrs_datapoint` SET incident_id = ? WHERE nrs_datastream_id = ? AND updated = ?',	$incident->id, $nrs_datastream->id, $updated_timestamp );
-					}
-		
-					
-					
+					$this->_generate_report($nrs_datastream_id,$post->title, $updated_timestamp , isset($post->whole_node) ? $post->whole_node: null);
 				}
 			}
 
@@ -384,6 +275,117 @@ class Nrs_overlimits_Controller extends Admin_Controller
 		$photo->media_date = date("Y-m-d H:i:s",time());
 		$photo->save();
 		$i++;
+	}
+
+	private function _generate_report($nrs_datastream_id,$overlimit_title, $updated_timestamp , $whole_node)
+	{
+		$nrs_datastream = new Nrs_datastream_Model($nrs_datastream_id);
+		// Yes! everything is valid
+		$location_id = $nrs_datastream->nrs_environment->location->id;
+		// STEP 1: SAVE LOCATION
+		$location = new Location_Model($location_id);
+
+		// STEP 2: SAVE INCIDENT
+		$incident = new Incident_Model(False);
+		$incident->incident_dateadd = date("Y-m-d H:i:s",time());
+		$incident->location_id = $location_id;
+		// Check if the user id has been specified
+		if ( ! $incident->loaded AND isset($_SESSION['auth_user']))
+		{
+			$incident->user_id = $_SESSION['auth_user']->id;
+		}
+		$incident->incident_title = $overlimit_title;
+		$incident->incident_description = "Report Manually Generated from " . $nrs_datastream->nrs_environment->title . ": ". $overlimit_title . " at " . $updated_timestamp;
+		$incident->incident_date = $updated_timestamp;
+		$incident->incident_mode = 5; // NRS Service TO BE IMPLEMENTED
+
+		$incident->incident_active = 1;
+		$incident->incident_verified = 1;
+		$incident->incident_alert_status = 1;
+		$incident->save();
+
+		// STEP 2b: Record Approval/Verification Action
+		reports::verify_approve($incident);
+
+		// STEP 2c: SAVE INCIDENT GEOMETRIES
+		// reports::save_report_geometry($post, $incident);
+
+		// STEP 3: SAVE CATEGORIES...COLLEGATO AL NODO
+		// Delete Previous Entries
+
+		ORM::factory('incident_category')->where('incident_id', $incident->id)->delete_all();
+
+		foreach ($nrs_datastream->nrs_node->nrs_node_category as $category)
+		{
+			$incident_category = new Incident_Category_Model();
+			$incident_category->incident_id = $incident->id;
+			$incident_category->category_id = $category->category_id;
+			$incident_category->save();
+		}
+
+		// STEP 4: SAVE MEDIA IMMAGINE DEL GRAFICO COLLEGATO A....
+		// reports::save_media($post, $incident);
+
+
+
+		$databary=$this->_get_bar_array($nrs_datastream_id,$updated_timestamp);
+		// New graph with a drop shadow
+		$graph = new Graph(600,400);
+		$graph->SetShadow();
+		// Use a "text" X-scale
+		$graph->SetScale("textlin");
+
+		$theme_class=new UniversalTheme;
+		$graph->SetTheme($theme_class);
+
+		$graph->SetBox(false);
+
+		$graph->ygrid->Show(true);
+		$graph->xgrid->Show(false);
+		$graph->yaxis->HideZeroLabel();
+		$graph->ygrid->SetFill(true,'#FFFFFF@0.5','#FFFFFF@0.5');
+		// $graph->SetBackgroundGradient('#0090DF', '#1FC4FF', GRAD_HOR, BGRAD_PLOT);
+
+		// Set title and subtitle
+		$graph->title->Set("NRS Events for Report ". $incident->incident_title );
+		if( isset($databary) && count($databary) < 20 ) {
+			$graph->xaxis->SetTickLabels($this->_get_label_array($nrs_datastream_id,$updated_timestamp));
+		}
+		else
+		{
+			$graph->xaxis->HideLabels();
+		}
+
+		// Create the line
+		$p1 = new LinePlot($databary);
+		$graph->Add($p1);
+
+		$p1->SetFillGradient('#AF0A0A','#6ADF45');
+		$p1->SetStepStyle();
+		$p1->SetColor('#808000');
+
+		$filename = Kohana::config('upload.directory', TRUE)."overlimits_".$nrs_datastream_id.".png";
+		$i = 1;
+		// Finally output the  image
+		$graph->Stroke($filename);
+
+		$this->_save_media($filename,$incident);
+
+
+		// STEP 5: SAVE PERSONAL INFORMATION
+		reports::save_personal_info($nrs_datastream->nrs_environment, $incident);
+
+		// STEP 6: update nrs_datapoint
+		
+		$table_prefix = Kohana::config('database.default.table_prefix');
+		if(isset($whole_node)) 
+		{
+			Database::instance()->query('UPDATE `'.$table_prefix.'nrs_datapoint` SET incident_id = ? WHERE nrs_node_id = ? AND updated = ?', $incident->id, $nrs_datastream->nrs_node_id, $updated_timestamp );
+			// In the case of WHOLE NODE.......we need to manage the incident properly...Description??
+		}
+		else {
+			Database::instance()->query('UPDATE `'.$table_prefix.'nrs_datapoint` SET incident_id = ? WHERE nrs_datastream_id = ? AND updated = ?',	$incident->id, $nrs_datastream->id, $updated_timestamp );
+		}
 	}
 
 }
