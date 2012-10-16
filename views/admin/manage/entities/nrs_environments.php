@@ -152,7 +152,7 @@
 
 										<td class="col-4">
 												<ul>
-													<li class="none-separator"><a href="#add" onClick="fillFields('<?php echo(rawurlencode($nrs_environment_id)); ?>','<?php echo(rawurlencode($nrs_environment_title)); ?>','<?php echo(rawurlencode($nrs_environment_description)); ?>','<?php echo(rawurlencode($nrs_environment_uid)); ?>','<?php echo(rawurlencode($nrs_environment->location_name)); ?>','<?php echo(rawurlencode($nrs_environment->location_disposition)); ?>','<?php echo(rawurlencode($nrs_environment->location_exposure)); ?>','<?php echo(rawurlencode($nrs_environment->location_latitude)); ?>','<?php echo(rawurlencode($nrs_environment->location_longitude)); ?>','<?php echo(rawurlencode($nrs_environment->location_elevation)); ?>','<?php echo(rawurlencode($nrs_environment->feed)); ?>','<?php echo(rawurlencode($nrs_environment->status)); ?>')"><?php echo Kohana::lang('ui_main.edit');?></a></li>
+													<li class="none-separator"><a href="#add" onClick="fillFields('<?php echo(rawurlencode($nrs_environment_id)); ?>','<?php echo(rawurlencode($nrs_environment_title)); ?>','<?php echo(rawurlencode($nrs_environment_description)); ?>','<?php echo(rawurlencode($nrs_environment_uid)); ?>','<?php echo(rawurlencode($nrs_environment->location_name)); ?>','<?php echo(rawurlencode($nrs_environment->location_disposition)); ?>','<?php echo(rawurlencode($nrs_environment->location_exposure)); ?>','<?php echo(rawurlencode($nrs_environment->location_latitude)); ?>','<?php echo(rawurlencode($nrs_environment->location_longitude)); ?>','<?php echo(rawurlencode($nrs_environment->location_elevation)); ?>','<?php echo(rawurlencode($nrs_environment->feed)); ?>','<?php echo(rawurlencode($nrs_environment->status)); ?>','<?php echo(rawurlencode($nrs_environment->person_first)); ?>','<?php echo(rawurlencode($nrs_environment->person_last)); ?>','<?php echo(rawurlencode($nrs_environment->person_email)); ?>','<?php echo(rawurlencode($nrs_environment->person_phone)); ?>')"><?php echo Kohana::lang('ui_main.edit');?></a></li>
 													<li class="none-separator">
 													<?php if($nrs_environment_active==1 || $nrs_environment_active==2) {?>
 													<a href="javascript:environmentAction('h','HIDE',<?php echo rawurlencode($nrs_environment_id);?>)" class="status_yes"><?php echo ($nrs_environment_active==2? Kohana::lang('nrs.env_status_2') : Kohana::lang('nrs.env_status_1') );?></a>
@@ -237,6 +237,26 @@
 								<strong><?php echo Kohana::lang('nrs.location_elevation');?>:</strong><br />
 								<?php print form::input('location_elevation', '', ' class="text"'); ?>
 							</div>
+
+
+							<div class="tab_form_item">
+								<strong><?php echo Kohana::lang('nrs.person_first');?>:</strong><br />
+								<?php print form::input('person_first', '', ' class="text"'); ?>
+							</div>
+							<div class="tab_form_item">
+								<strong><?php echo Kohana::lang('nrs.person_last');?>:</strong><br />
+								<?php print form::input('person_last', '', ' class="text"'); ?>
+							</div>
+							<div class="tab_form_item">
+								<strong><?php echo Kohana::lang('nrs.person_email');?>:</strong><br />
+								<?php print form::input('person_email', '', ' class="text"'); ?>
+							</div>
+							<div class="tab_form_item">
+								<strong><?php echo Kohana::lang('nrs.person_phone');?>:</strong><br />
+								<?php print form::input('person_phone', '', ' class="text"'); ?>
+							</div>
+
+
 							<div style="clear:both"></div>
 							<div class="tab_form_item">
 								<strong><?php echo Kohana::lang('nrs.feed');?>:</strong><br />

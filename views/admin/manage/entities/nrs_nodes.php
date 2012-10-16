@@ -110,6 +110,12 @@
 									$nrs_only_node_uid = $arr_res[0];
 									$status_descr = "ND";
 									$status_id = $nrs_node->status;
+									// Retrieve Categories
+									$nrs_node_category = array();
+									foreach($nrs_node->nrs_node_category as $category)
+									{
+										$nrs_node_category[] = $category->category_id;
+									}
 									switch ($status_id) {
 										case 1:  
 											$status_descr = "OFF";
@@ -150,7 +156,7 @@
 
 										<td class="col-4">
 												<ul>
-													<li class="none-separator"><a href="#add" onClick="fillFields('<?php echo(rawurlencode($nrs_node_id)); ?>','<?php echo(rawurlencode($nrs_node_title)); ?>','<?php echo(rawurlencode($nrs_node_description)); ?>','<?php echo(rawurlencode($nrs_env_uid)); ?>','<?php echo(rawurlencode($nrs_only_node_uid)); ?>','<?php echo(rawurlencode($nrs_node->node_disposition)); ?>','<?php echo(rawurlencode($nrs_node->node_exposure)); ?>','<?php echo(rawurlencode($nrs_node->status)); ?>','<?php echo(rawurlencode($nrs_node->risk_level)); ?>','<?php echo(rawurlencode($nrs_node->nrs_environment_id)); ?>','<?php echo(rawurlencode($nrs_node->last_update)); ?>')"><?php echo Kohana::lang('ui_main.edit');?></a></li>
+													<li class="none-separator"><a href="#add" onClick="fillFields('<?php echo(rawurlencode($nrs_node_id)); ?>','<?php echo(rawurlencode($nrs_node_title)); ?>','<?php echo(rawurlencode($nrs_node_description)); ?>','<?php echo(rawurlencode($nrs_env_uid)); ?>','<?php echo(rawurlencode($nrs_only_node_uid)); ?>','<?php echo(rawurlencode($nrs_node->node_disposition)); ?>','<?php echo(rawurlencode($nrs_node->node_exposure)); ?>','<?php echo(rawurlencode($nrs_node->status)); ?>','<?php echo(rawurlencode($nrs_node->risk_level)); ?>','<?php echo(rawurlencode($nrs_node->nrs_environment_id)); ?>','<?php echo(rawurlencode($nrs_node->last_update)); ?>',<?php echo( json_encode( $nrs_node_category)); ?>)"><?php echo Kohana::lang('ui_main.edit');?></a></li>
 													<li class="none-separator">
 													<?php if($nrs_node_active==1 || $nrs_node_active==2) {?>
 													<a href="javascript:nodeAction('h','HIDE',<?php echo rawurlencode($nrs_node_id);?>)" class="status_yes"><?php echo ($nrs_node_active==2? Kohana::lang('nrs.env_status_2') : Kohana::lang('nrs.env_status_1') );?></a>
@@ -232,11 +238,32 @@
 							<strong><?php echo Kohana::lang('nrs.last_update');?>:</strong><br />
 							<?php print form::input('last_update', '', ' readonly="readonly" class="text"'); ?>
 						</div>
+
+
+						<div style="clear:both"></div>
+						<div class="tab_form_item">
+							<h4><?php echo Kohana::lang('ui_main.categories');?> 
+								<span><?php echo Kohana::lang('ui_main.select_multiple');?>.</span>  <span class="required">*</span></h4>
+			                    		<div class="report_category">
+                        	    				<?php
+									$selected_categories = array();
+									echo category::tree($categories, TRUE, $selected_categories, 'nrs_node_category');									
+								?>
+           						</div>
+						</div>
+
+
+						<div style="clear:both"></div>
 						<div class="tab_form_item">
 							<strong><?php echo Kohana::lang('nrs.description');?>:</strong><br />
 							<?php print form::textarea('description','', ' rows="12" cols="40"') ?>
 
 						</div>
+
+
+
+
+
 						<div style="clear:both"></div>
 						<div class="tab_form_item">
 							<input type="submit" class="save-rep-btn" value="<?php echo Kohana::lang('ui_main.save');?>" />

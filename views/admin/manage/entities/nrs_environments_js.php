@@ -935,7 +935,7 @@ function preview ( id ){
 }
 
 // NRS EnvironmentJS
-function fillFields(nrs_environment_id, nrs_environment_title, nrs_environment_desctiption,nrs_environment_uid,loc_name,loc_dispo,loc_expo,loc_lat,loc_lon,loc_elev,feed,status)
+function fillFields(nrs_environment_id, nrs_environment_title, nrs_environment_desctiption,nrs_environment_uid,loc_name,loc_dispo,loc_expo,loc_lat,loc_lon,loc_elev,feed,status,person_first,person_last,person_email,person_phone)
 {
 	$("#nrs_environment_id").attr("value", decodeURIComponent(nrs_environment_id));
 	$("#title").attr("value", decodeURIComponent(nrs_environment_title));
@@ -949,6 +949,10 @@ function fillFields(nrs_environment_id, nrs_environment_title, nrs_environment_d
 	$("#latitude").attr("value", decodeURIComponent(loc_lat));
 	$("#longitude").attr("value", decodeURIComponent(loc_lon));
 	$("#status").attr("value", decodeURIComponent(status));
+	$("#person_first").attr("value", decodeURIComponent(person_first));
+	$("#person_last").attr("value", decodeURIComponent(person_last));
+	$("#person_email").attr("value", decodeURIComponent(person_email));
+	$("#person_phone").attr("value", decodeURIComponent(person_phone));
 
 	if (!isNaN(loc_lat) && !isNaN(loc_lon))
 	{

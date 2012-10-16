@@ -56,14 +56,53 @@
 				<?php
 				}
 				?>
-				<!-- report-table -->
-				<?php print form::open(NULL, array('id' => 'nrs_overlimitListing', 'name' => 'nrs_overlimitListing')); ?>
-				<!-- HERE THE FORM -->
-					<input type="hidden" name="action" id="action" value="">
-					<div class="table-holder">
-						<div id="visualization" style="width: 800px; height: 400px;"></div>
+				<?php if(isset($nrs_overlimits) && !empty($nrs_overlimits) && count($nrs_overlimits)>0) { ?>
+				<div id="visualization" style="width: 800px; height: 400px;"></div>
+				<?php
+				} else {
+				?>
+				<span>THERE ARE NO RELEVANT EVENTS AVAILABLE</span>
+				<?php
+				}
+				?>
+				<!-- tabs -->
+				<div class="tabs">
+					<!-- tabset -->
+					<a name="add"></a>
+					<ul class="tabset">
+						<li><a href="#" class="active"><?php echo Kohana::lang('ui_main.create_report');?></a></li>
+					</ul>
+					<div class="tab">
+						<!-- report-table -->
+						<?php print form::open(NULL, array('id' => 'nrs_overlimitListing', 'name' => 'nrs_overlimitListing')); ?>
+						<!-- HERE THE FORM -->
+						<input type="hidden" id="nrs_datastream_id" name="nrs_datastream_id" value="" />
+						<input type="hidden" id="updated_timestamp" name="updated_timestamp" value="" />
+						<input type="hidden" name="action" id="action" value="g">
+						
+
+
+						<div class="tab_form_item">
+							<strong><?php echo Kohana::lang('ui_main.title');?>:</strong><br />
+							<?php print form::input('title', '', ' class="text"'); ?>
+						</div>
+
+						<div class="tab_form_item">
+							<h4><?php echo Kohana::lang('ui_main.date');?> <span><?php echo Kohana::lang('ui_main.date_format');?></span></h4>
+							<?php print form::input('updated_date', '', ' readonly="readonly" class="text"'); ?>								
+							<?php print $date_picker_js; ?>		
+						</div>
+						<div class="tab_form_item">
+							<br /><strong><?php echo "Link the whole ".Kohana::lang('nrs.node');?>:</strong>
+							<?php print form::checkbox('whole_node', '1', True); ?>
+						</div>
+						<div class="tab_form_item">
+							<input type="submit" class="save-rep-btn" value="<?php echo Kohana::lang('ui_main.create');?>" />
+						</div>
+
+						<?php print form::close(); ?>
+
 					</div>
 
-				<?php print form::close(); ?>
-
+				</div>
 			</div>

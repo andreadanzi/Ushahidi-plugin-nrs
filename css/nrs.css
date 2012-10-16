@@ -53,3 +53,14 @@ input.uid {
 	width: 440px;
 	margin: 0 0 0 90px;
 }
+
+
+ul.post-info li a.nrs {
+    background: url("img/admin/nrs.gif") no-repeat scroll 100% 3px transparent;
+}
+
+#filter_link_mode_5 span.item-icon {
+    background: url("img/admin/nrs.gif") no-repeat scroll 0 0 transparent;
+}
+
+

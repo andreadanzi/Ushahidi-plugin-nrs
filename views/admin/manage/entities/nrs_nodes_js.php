@@ -91,8 +91,19 @@ function fillEnvUID(elem,nrs_env_uids)
 }
 
 // NRS NodeJS
-function fillFields(nrs_node_id, nrs_node_title, nrs_node_desctiption,nrs_env_uid,nrs_only_node_uid,dispo,expo,status,risk_level,nrs_environment_id,last_update)
+function fillFields(nrs_node_id, nrs_node_title, nrs_node_desctiption,nrs_env_uid,nrs_only_node_uid,dispo,expo,status,risk_level,nrs_environment_id,last_update,node_categories)
 {
+	$("#category-column-1 input").each(function(index){
+		var chkValue =  $(this).attr("value");
+		for (var i = 0; i < node_categories.length; i++) {
+	    		catId = node_categories[i];
+			if(  chkValue == catId )
+			{
+				 $(this).attr("checked","checked");
+			}
+		}
+	});
+
 	$("#nrs_node_id").attr("value", decodeURIComponent(nrs_node_id));
 	$("#title").attr("value", decodeURIComponent(nrs_node_title));
 	$("#description").attr("value", decodeURIComponent(nrs_node_desctiption));
@@ -123,3 +134,12 @@ function nodeAction( action, confirmAction, id )
 }
 
 google.setOnLoadCallback(drawVisualization);
+
+jQuery(window).load(function() {
+	// Category treeview
+	$("#category-column-1,#category-column-2").treeview({
+	  persist: "location",
+	  collapsed: true,
+	  unique: false
+	});
+});

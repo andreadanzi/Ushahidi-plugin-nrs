@@ -110,6 +110,12 @@ class Nrs_Install {
 				location_latitude varchar(255) DEFAULT NULL,
 				location_longitude varchar(255) DEFAULT NULL,
 				location_elevation int(11) unsigned DEFAULT '0',
+
+				person_first varchar(200) DEFAULT NULL,
+				person_last varchar(200) DEFAULT NULL,
+				person_email varchar(120) DEFAULT NULL,
+				person_phone varchar(60) DEFAULT NULL,
+
 				feed text,
 				PRIMARY KEY (id)
 			);
@@ -192,11 +198,12 @@ class Nrs_Install {
 
 
 		$this->db->query("
-			CREATE VIEW IF NOT EXISTS `".Kohana::config('database.default.table_prefix')."nrs_overlimits` AS 
+			CREATE VIEW `".Kohana::config('database.default.table_prefix')."nrs_overlimits` AS 
 				SELECT 
 				nrs_datapoint.nrs_environment_id,
 				nrs_datapoint.nrs_node_id,
 				nrs_datapoint.nrs_datastream_id,
+				nrs_datapoint.incident_id,
 				nrs_datapoint.id as nrs_datapoint_id,
 				nrs_datapoint.sample_no,
 				constant_value + (nrs_datapoint.value_at - lambda_value)*factor_value AS calculated_value,
@@ -214,6 +221,15 @@ class Nrs_Install {
 				ORDER BY nrs_datapoint.nrs_datastream_id, nrs_datapoint.datetime_at, nrs_datapoint.updated, nrs_datapoint.sample_no;
 		");
 
+		$this->db->query("
+			CREATE TABLE IF NOT EXISTS `".Kohana::config('database.default.table_prefix')."nrs_node_category` (
+				id int(11) unsigned NOT NULL AUTO_INCREMENT,
+				nrs_node_id int(11) unsigned NOT NULL DEFAULT '0',				
+				category_id int(11) unsigned NOT NULL DEFAULT '5',				
+				PRIMARY KEY (id),
+				UNIQUE KEY node_category_ids (nrs_node_id,category_id)
+			);
+		");
 	}
 
 	/**
@@ -233,5 +249,6 @@ class Nrs_Install {
 		$this->db->query('DROP TABLE `'.Kohana::config('database.default.table_prefix').'nrs_mqtt_subscription`');
 		$this->db->query('DROP TABLE `'.Kohana::config('database.default.table_prefix').'nrs_csv_client`');
 		$this->db->query('DROP VIEW `'.Kohana::config('database.default.table_prefix').'nrs_overlimits`');
+		$this->db->query('DROP VIEW `'.Kohana::config('database.default.table_prefix').'nrs_node_category`');
 	}
 }

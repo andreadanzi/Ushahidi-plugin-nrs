@@ -130,6 +130,18 @@ class Nrs_nodes_Controller extends Admin_Controller
 					$nrs_node->risk_level = $post->risk_level;
 					$nrs_node->save();
 			
+
+					// nrs_node_category - delete Previous Entries
+					ORM::factory('nrs_node_category')->where('nrs_node_id', $nrs_node->id)->delete_all();
+		
+					foreach ($post->nrs_node_category as $item)
+					{
+						$node_category = new Nrs_node_Category_Model();
+						$node_category->nrs_node_id = $nrs_node->id;
+						$node_category->category_id = $item;
+						$node_category->save();
+					}
+
 					$form_saved = TRUE;
 					$form_action = utf8::strtoupper(Kohana::lang('ui_admin.created_edited'));
 				}
@@ -161,6 +173,13 @@ class Nrs_nodes_Controller extends Admin_Controller
 						->where($filter)
 						->orderby('updated','desc')
 						->find_all($this->items_per_page, $pagination->sql_offset);
+
+		// Create Categories
+		$this->template->content->categories = Category_Model::get_categories(0, FALSE, FALSE);
+		$this->template->content->new_categories_form = $this->_new_categories_form_arr();
+		$this->template->content->new_category_toggle_js = $this->_new_category_toggle_js();
+		$this->template->content->color_picker_js = $this->_color_picker_js();
+		$this->template->treeview_enabled = TRUE;
 
 		$this->template->content->nrs_nodes = $nrs_nodes;
 		$this->template->content->status_array = $this->_status_array();
@@ -272,6 +291,50 @@ class Nrs_nodes_Controller extends Admin_Controller
 		return $datapoints_array;
 	}
 
+	// Dynamic categories form fields
+	private function _new_categories_form_arr()
+	{
+		return array(
+			'category_name' => '',
+			'category_description' => '',
+			'category_color' => '',
+		);
+	}
+
+	// Javascript functions
+	private function _new_category_toggle_js()
+	{
+		return "<script type=\"text/javascript\">
+				$(document).ready(function() {
+				$('a#category_toggle').click(function() {
+				$('#category_add').toggle(400);
+				return false;
+				});
+				});
+			</script>";
+	}
+
+	private function _color_picker_js()
+	{
+		 return "<script type=\"text/javascript\">
+					$(document).ready(function() {
+					$('#category_color').ColorPicker({
+							onSubmit: function(hsb, hex, rgb) {
+								$('#category_color').val(hex);
+							},
+							onChange: function(hsb, hex, rgb) {
+								$('#category_color').val(hex);
+							},
+							onBeforeShow: function () {
+								$(this).ColorPickerSetColor(this.value);
+							}
+						})
+					.bind('keyup', function(){
+						$(this).ColorPickerSetColor(this.value);
+					});
+					});
+				</script>";
+	}
 }
 
 ?>

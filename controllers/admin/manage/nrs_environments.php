@@ -112,6 +112,10 @@ class Nrs_environments_Controller extends Admin_Controller
 				// Save Action
 				else
 				{ 
+					$nrs_environment->person_first = $post->person_first;
+					$nrs_environment->person_last = $post->person_last;
+					$nrs_environment->person_email = $post->person_email;
+					$nrs_environment->person_phone = $post->person_phone;
 					$nrs_environment->title = $post->title;
 					$nrs_environment->environment_uid = $post->environment_uid;
 					$nrs_environment->description = $post->description;
