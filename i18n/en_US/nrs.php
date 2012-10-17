@@ -66,6 +66,16 @@
 	'min_value' => 'Min Value',
 	'NO_DATAPOINTS'=>'No datapoints available',
 	'overlimits'=>'Events',
+	'automatic_reports' => 'Auto Report?',
+	'person_first' => 'First name',
+	'person_last' => 'Last name',
+	'person_email' => 'e-mail?',
+	'person_phone' => 'phone',
+	'samples_num' => 'Samples',
+	'factor_title' => 'Factor title',
+	'factor_value' => 'Factor',
+	'lambda_value' => 'Lambda',
+	'constant_value' => 'Constant'
 
 	);	
 ?>

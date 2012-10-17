@@ -122,23 +122,38 @@ class Nrs_environments_Controller extends Admin_Controller
 					$nrs_environment->status = $post->status;
 					$nrs_environment->location_disposition = $post->location_disposition;
 					$nrs_environment->location_exposure = $post->location_exposure;
-					$nrs_environment->location_latitude = $post->latitude;
-					$nrs_environment->location_longitude = $post->longitude;
 
-					if (isset($nrs_environment->location_latitude) AND isset($nrs_environment->location_longitude) AND !empty($nrs_environment->location_latitude) AND !empty($nrs_environment->location_longitude))
+					if (isset($post->latitude) AND isset($post->longitude) AND !empty($post->latitude) AND !empty($post->longitude))
 					{
-						$location =  ORM::factory('location')->where('latitude',$nrs_environment->location_latitude)->where('longitude',$nrs_environment->location_longitude)->find();
+						$location =  ORM::factory('location')->where('latitude',$post->latitude)->where('longitude',$post->longitude)->find();
 						if( !isset($location) || $location->id == 0 ) {
 							$location = new Location_Model();
 							$location->location_name = (isset($post->location_name) AND !empty($post->location_name)) ? $post->location_name : Kohana::lang('ui_admin.unknown');
-							$location->latitude = $nrs_environment->location_latitude;
-							$location->longitude = $nrs_environment->location_longitude;
+							$location->latitude = $post->latitude;
+							$location->longitude = $post->longitude;
 							$location->location_date = date("Y-m-d H:i:s",time());
-							$location->save();
+							$location_id = $location->save()->id;
+							$location =  ORM::factory('location',$location_id);
 						}
 						$nrs_environment->location_id = $location->id;
+						$nrs_environment->location_latitude = $location->latitude;
+						$nrs_environment->location_longitude = $location->longitude;
+						$nrs_environment->location_name = $location->location_name;
 					}	
-					$nrs_environment->location_name = $location->location_name;
+					else if( isset($post->location_name) AND !empty($post->location_name) )
+					{
+						$location =  ORM::factory('location')->where('location_name',$post->location_name)->find();
+						if( !isset($location) || $location->id == 0 ) {
+							$nrs_environment->location_name = $post->location_name;
+						}
+						else
+						{							
+							$nrs_environment->location_id = $location->id;
+							$nrs_environment->location_latitude = $location->latitude;
+							$nrs_environment->location_longitude = $location->longitude;
+							$nrs_environment->location_name = $location->location_name;
+						}
+					}
 					$nrs_environment->location_elevation = $post->location_elevation;
 					$nrs_environment->feed = $post->feed;
 					$nrs_environment->updated = date("Y-m-d H:i:s",time());
@@ -184,6 +199,7 @@ class Nrs_environments_Controller extends Admin_Controller
 		$this->template->content->overlimits = $this->_check_overlimits();
 		$this->template->content->status_array = $this->_status_array();
 		$this->template->content->stroke_width_array = $this->_stroke_width_array();
+		$this->template->content->automatic_reports_array = $this->_automatic_reports_array();
 		$this->template->content->pagination = $pagination;
 		$this->template->content->form_error = $form_error;
 		$this->template->content->form_saved = $form_saved;
@@ -216,6 +232,14 @@ class Nrs_environments_Controller extends Admin_Controller
 	public function edit($id = FALSE, $saved = FALSE)
 	{
 	}		
+
+	// reports array function
+	private function _automatic_reports_array() {
+		$reports_array[1] = "YES";
+		$reports_array[0] = "NO";
+		return $reports_array;
+	}
+
 	// Status array function
 	private function _status_array()
 	{

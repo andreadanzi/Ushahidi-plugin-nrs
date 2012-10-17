@@ -212,9 +212,14 @@ class Nrs_Install {
 				nrs_datapoint.datetime_at,
 				nrs_datapoint.updated,
 				nrs_datastream.title
-				FROM nrs_datapoint, nrs_datastream 
+				FROM nrs_datapoint, nrs_datastream ,nrs_node ,nrs_environment 
 				WHERE 
-				nrs_datastream.id = nrs_datapoint.nrs_datastream_id AND (
+				nrs_environment.id = nrs_datapoint.nrs_environment_id AND
+				nrs_environment.active= 1 AND
+				nrs_node.id = nrs_datapoint.nrs_node_id AND
+				nrs_node.active= 1 AND
+				nrs_datastream.id = nrs_datapoint.nrs_datastream_id AND
+				nrs_datastream.active= 1 AND (
 				constant_value + (nrs_datapoint.value_at - lambda_value)*factor_value <= nrs_datastream.min_value 
 				OR
 				constant_value + (nrs_datapoint.value_at - lambda_value)*factor_value >= nrs_datastream.max_value )
@@ -228,6 +233,19 @@ class Nrs_Install {
 				category_id int(11) unsigned NOT NULL DEFAULT '5',				
 				PRIMARY KEY (id),
 				UNIQUE KEY node_category_ids (nrs_node_id,category_id)
+			);
+		");
+	
+		$this->db->query("
+			CREATE TABLE IF NOT EXISTS `".Kohana::config('database.default.table_prefix')."nrs_meta` (
+				id int(11) unsigned NOT NULL AUTO_INCREMENT,
+				nrs_entity_id int(11) unsigned NOT NULL DEFAULT '0',	
+				nrs_entity_type	tinyint(4) NOT NULL default '0' COMMENT '1 - Environment, 2 - Node, 3 - Datastream, 4 - Datapoint',		
+				meta_key varchar(255) NULL DEFAULT NULL,
+				meta_value longtext NULL DEFAULT NULL,
+				PRIMARY KEY (id),
+				KEY nrs_entity_id (nrs_entity_id),
+				KEY meta_key (meta_key)
 			);
 		");
 
@@ -266,5 +284,6 @@ class Nrs_Install {
 		$this->db->query('DROP TABLE `'.Kohana::config('database.default.table_prefix').'nrs_csv_client`');
 		$this->db->query('DROP VIEW `'.Kohana::config('database.default.table_prefix').'nrs_overlimits`');
 		$this->db->query('DROP TABLE `'.Kohana::config('database.default.table_prefix').'nrs_node_category`');
+		$this->db->query('DROP TABLE `'.Kohana::config('database.default.table_prefix').'nrs_meta`');
 	}
 }

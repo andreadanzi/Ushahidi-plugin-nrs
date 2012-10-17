@@ -128,7 +128,7 @@
 											break;
 									}
 									$location_id = $nrs_environment->location_id;
-									
+
 									
 									$nodes_count = ORM::factory('nrs_node')->where('nrs_environment_id',$nrs_environment->id)->count_all();
 									?>
@@ -152,7 +152,7 @@
 
 										<td class="col-4">
 												<ul>
-													<li class="none-separator"><a href="#add" onClick="fillFields('<?php echo(rawurlencode($nrs_environment_id)); ?>','<?php echo(rawurlencode($nrs_environment_title)); ?>','<?php echo(rawurlencode($nrs_environment_description)); ?>','<?php echo(rawurlencode($nrs_environment_uid)); ?>','<?php echo(rawurlencode($nrs_environment->location_name)); ?>','<?php echo(rawurlencode($nrs_environment->location_disposition)); ?>','<?php echo(rawurlencode($nrs_environment->location_exposure)); ?>','<?php echo(rawurlencode($nrs_environment->location_latitude)); ?>','<?php echo(rawurlencode($nrs_environment->location_longitude)); ?>','<?php echo(rawurlencode($nrs_environment->location_elevation)); ?>','<?php echo(rawurlencode($nrs_environment->feed)); ?>','<?php echo(rawurlencode($nrs_environment->status)); ?>','<?php echo(rawurlencode($nrs_environment->person_first)); ?>','<?php echo(rawurlencode($nrs_environment->person_last)); ?>','<?php echo(rawurlencode($nrs_environment->person_email)); ?>','<?php echo(rawurlencode($nrs_environment->person_phone)); ?>')"><?php echo Kohana::lang('ui_main.edit');?></a></li>
+													<li class="none-separator"><a href="#add" onClick="fillFields('<?php echo(rawurlencode($nrs_environment_id)); ?>','<?php echo(rawurlencode($nrs_environment_title)); ?>','<?php echo(rawurlencode($nrs_environment_description)); ?>','<?php echo(rawurlencode($nrs_environment_uid)); ?>','<?php echo(rawurlencode($nrs_environment->location_name)); ?>','<?php echo(rawurlencode($nrs_environment->location_disposition)); ?>','<?php echo(rawurlencode($nrs_environment->location_exposure)); ?>','<?php echo(rawurlencode($nrs_environment->location->latitude)); ?>','<?php echo(rawurlencode($nrs_environment->location->longitude)); ?>','<?php echo(rawurlencode($nrs_environment->location_elevation)); ?>','<?php echo(rawurlencode($nrs_environment->feed)); ?>','<?php echo(rawurlencode($nrs_environment->status)); ?>','<?php echo(rawurlencode($nrs_environment->person_first)); ?>','<?php echo(rawurlencode($nrs_environment->person_last)); ?>','<?php echo(rawurlencode($nrs_environment->person_email)); ?>','<?php echo(rawurlencode($nrs_environment->person_phone)); ?>','<?php echo(rawurlencode($nrs_environment->automatic_reports)); ?>','<?php echo(rawurlencode($location_id)); ?>')"><?php echo Kohana::lang('ui_main.edit');?></a></li>
 													<li class="none-separator">
 													<?php if($nrs_environment_active==1 || $nrs_environment_active==2) {?>
 													<a href="javascript:environmentAction('h','HIDE',<?php echo rawurlencode($nrs_environment_id);?>)" class="status_yes"><?php echo ($nrs_environment_active==2? Kohana::lang('nrs.env_status_2') : Kohana::lang('nrs.env_status_1') );?></a>
@@ -192,22 +192,24 @@
 						<?php print form::open(NULL,array('id' => 'nrs_environmentMain', 'name' => 'nrs_environmentMain')); ?>
 						
 						<div class="nrs-col-1">
+							<input type="hidden" id="location_id" 
+								name="location_id" value="" />
 							<input type="hidden" id="nrs_environment_id" 
 								name="nrs_environment_id" value="" />
 							<input type="hidden" name="action" 
 								id="action" value="a"/>
 							<div class="tab_form_item">
 								<strong><?php echo Kohana::lang('ui_main.name');?>:</strong><br />
-								<?php print form::input('title', '', ' class="text"'); ?>
+								<?php print form::input('title', '', ' class="text smaller"'); ?>
 							</div>
 							<div class="tab_form_item">
 								<strong><?php echo Kohana::lang('nrs.environment_uid');?>:</strong><br />
-								<?php print form::input('environment_uid', '', ' class="text"'); ?>
+								<?php print form::input('environment_uid', '', ' class="text smaller"'); ?>
 							</div>
 							<div style="clear:both"></div>
 							<div class="tab_form_item">
 								<strong><?php echo Kohana::lang('nrs.location_name');?>:</strong><br />
-								<?php print form::input('location_name', '', ' class="text"'); ?>
+								<?php print form::input('location_name', '', ' class="text smaller"'); ?>
 							</div>
 							<div class="tab_form_item">
 								<strong><?php echo Kohana::lang('nrs.status');?>:</strong><br />
@@ -218,42 +220,50 @@
 							<div style="clear:both"></div>
 							<div class="tab_form_item">
 								<strong><?php echo Kohana::lang('nrs.location_disposition');?>:</strong><br />
-								<?php print form::input('location_disposition', '', ' class="text"'); ?>
+								<?php print form::input('location_disposition', '', ' class="text smaller"'); ?>
 							</div>
 							<div class="tab_form_item">
 								<strong><?php echo Kohana::lang('nrs.location_exposure');?>:</strong><br />
-								<?php print form::input('location_exposure', '', ' class="text"'); ?>
+								<?php print form::input('location_exposure', '', ' class="text smaller"'); ?>
 							</div>
 							<div style="clear:both"></div>
 							<div class="tab_form_item">
 								<strong><?php echo Kohana::lang('nrs.location_latitude');?>:</strong><br />
-								<?php print form::input('latitude', '', ' class="text"'); ?>
+								<?php print form::input('latitude', '', ' class="text smaller"'); ?>
 							</div>
 							<div class="tab_form_item">
 								<strong><?php echo Kohana::lang('nrs.location_longitude');?>:</strong><br />
-								<?php print form::input('longitude', '', ' class="text"'); ?>
+								<?php print form::input('longitude', '', ' class="text smaller"'); ?>
 							</div>
+							<div style="clear:both"></div>
 							<div class="tab_form_item">
 								<strong><?php echo Kohana::lang('nrs.location_elevation');?>:</strong><br />
-								<?php print form::input('location_elevation', '', ' class="text"'); ?>
+								<?php print form::input('location_elevation', '', ' class="text smaller"'); ?>
 							</div>
 
 
 							<div class="tab_form_item">
+								<strong><?php echo Kohana::lang('nrs.automatic_reports');?>:</strong><br />
+								<?php print '<span class="sel-holder">' .
+									    form::dropdown('automatic_reports', $automatic_reports_array,'') . '</span>'; ?>
+							</div>
+							<div style="clear:both"></div>
+							<div class="tab_form_item">
 								<strong><?php echo Kohana::lang('nrs.person_first');?>:</strong><br />
-								<?php print form::input('person_first', '', ' class="text"'); ?>
+								<?php print form::input('person_first', '', ' class="text smaller"'); ?>
 							</div>
 							<div class="tab_form_item">
 								<strong><?php echo Kohana::lang('nrs.person_last');?>:</strong><br />
-								<?php print form::input('person_last', '', ' class="text"'); ?>
+								<?php print form::input('person_last', '', ' class="text smaller"'); ?>
 							</div>
+							<div style="clear:both"></div>
 							<div class="tab_form_item">
 								<strong><?php echo Kohana::lang('nrs.person_email');?>:</strong><br />
-								<?php print form::input('person_email', '', ' class="text"'); ?>
+								<?php print form::input('person_email', '', ' class="text smaller"'); ?>
 							</div>
 							<div class="tab_form_item">
 								<strong><?php echo Kohana::lang('nrs.person_phone');?>:</strong><br />
-								<?php print form::input('person_phone', '', ' class="text"'); ?>
+								<?php print form::input('person_phone', '', ' class="text smaller"'); ?>
 							</div>
 
 

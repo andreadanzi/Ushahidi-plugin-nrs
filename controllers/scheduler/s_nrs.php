@@ -13,6 +13,9 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL)
 */
 
+require_once('jpgraph/jpgraph.php');
+require_once('jpgraph/jpgraph_line.php');
+
 class S_Nrs_Controller extends Controller {
 
 	public function __construct()
@@ -65,7 +68,7 @@ class S_Nrs_Controller extends Controller {
 			$incident->user_id = $_SESSION['auth_user']->id;
 		}
 		$incident->incident_title = $overlimit_title;
-		$incident->incident_description = "Report Autoamtically Generated from " . $nrs_datastream->nrs_environment->title . ": ". $overlimit_title . " at " . $updated_timestamp;
+		$incident->incident_description = "Report Automatically Generated from " . $nrs_datastream->nrs_environment->title . ": ". $overlimit_title . " at " . $updated_timestamp;
 		$incident->incident_date = $updated_timestamp;
 		$incident->incident_mode = 5; // NRS Service TO BE IMPLEMENTED
 

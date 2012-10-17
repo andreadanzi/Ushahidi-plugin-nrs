@@ -27,6 +27,11 @@ input.uid {
 	width: 67px;
 }
 
+
+input.smaller {
+	width: 100px;
+}
+
 .search-nrs-btn {
 	display:inline;
 	float:left;

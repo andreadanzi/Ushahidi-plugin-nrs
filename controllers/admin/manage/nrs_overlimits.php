@@ -1,8 +1,7 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
 require_once('jpgraph/jpgraph.php');
-require_once ('jpgraph/jpgraph_bar.php');
-require_once ('jpgraph/jpgraph_line.php');
+require_once('jpgraph/jpgraph_line.php');
 
 class Nrs_overlimits_Controller extends Admin_Controller
 {

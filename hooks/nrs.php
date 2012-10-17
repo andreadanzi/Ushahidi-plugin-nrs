@@ -50,7 +50,27 @@ class nrs {
 		{
 			Event::add('ushahidi_action.header_scripts', array($this, 'nrs_css_admin'));
 		}
-		// Event::add('ushahidi_action.header_scripts', array($this, 'nrs_google_js'));
+		Event::add('ushahidi_action.report_delete', array($this, 'delete_incident_id'));
+		Event::add('ushahidi_action.category_delete', array($this, 'delete_category_id'));
+
+	}
+	
+	public function delete_incident_id() {
+		$incident_id = Event::$data;
+		if($incident_id != FALSE)
+		{
+			$sql_query = "UPDATE nrs_datapoint SET incident_id = 0 WHERE incident_id = ?";
+			$distinct_updated_results = Database::instance('default')->query($sql_query,$incident_id);	
+		}
+	}
+
+	public function delete_category_id() {
+		$deleted_category_id = Event::$data;
+		if($deleted_category_id != FALSE )
+		{
+			$sql_query = "DELETE FROM nrs_node_category WHERE category_id = ?";
+			$distinct_updated_results = Database::instance('default')->query($sql_query,$deleted_category_id);	
+		}
 	}
 
 	public function _nrs()
