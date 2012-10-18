@@ -52,13 +52,14 @@ class nrs {
 		}
 		Event::add('ushahidi_action.report_delete', array($this, 'delete_incident_id'));
 		Event::add('ushahidi_action.category_delete', array($this, 'delete_category_id'));
+		Event::add('ushahidi_action.report_view_sidebar', array($this, 'nrs_report_meta')); // OR report_display_media or ushahidi_action.report_extra or .report_meta or .report_meta_after_time
 
 	}
 	
 	public function delete_incident_id() {
 		$incident_id = Event::$data;
 		if($incident_id != FALSE)
-		{
+		{	// UPDATE DATAPOINT WITH EMPTY INCIDENT
 			$sql_query = "UPDATE nrs_datapoint SET incident_id = 0 WHERE incident_id = ?";
 			$distinct_updated_results = Database::instance('default')->query($sql_query,$incident_id);	
 		}
@@ -123,6 +124,30 @@ class nrs {
 	{
 		$css = View::factory('css/nrs_css');
 		$css->render(TRUE);
+	}
+
+	public function nrs_report_meta()
+	{
+		$view = View::factory('display_nrs_report'); // TBIMPLEMENTED 
+
+		$incident_id = Event::$data;
+		$view->datapoints = $this->get_nrs_datapoints($incident_id); // TBIMPLEMENTED
+		
+		$show = FALSE;
+		if(count($view->datapoints) > 0)
+		{
+			$show = TRUE;
+		}
+		$view->render($show);
+	}
+
+	public function get_nrs_datapoints($incident_id=FALSE)
+	{
+		$nrs_datapoints = ORM::factory('nrs_datapoint')
+						->where("incident_id",$incident_id)
+						->orderby('datetime_at','asc')
+						->find_all();
+		return $nrs_datapoints;
 	}
 }
 new nrs;

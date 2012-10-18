@@ -53,15 +53,17 @@ class S_Nrs_Controller extends Controller {
 	private function _generate_report($nrs_datastream_id,$overlimit_title, $updated_timestamp , $whole_node)
 	{
 		$nrs_datastream = new Nrs_datastream_Model($nrs_datastream_id);
-		// Yes! everything is valid
-		$location_id = $nrs_datastream->nrs_environment->location->id;
 		// STEP 1: SAVE LOCATION
-		$location = new Location_Model($location_id);
-
+		$report_location = new Location_Model();
+		$report_location->location_name = $nrs_datastream->nrs_environment->location->location_name;
+		$report_location->latitude = $nrs_datastream->nrs_environment->location->latitude;
+		$report_location->longitude = $nrs_datastream->nrs_environment->location->longitude;
+		$report_location->location_date = date("Y-m-d H:i:s",time());
+		$report_location_id = $report_location->save()->id;
 		// STEP 2: SAVE INCIDENT
 		$incident = new Incident_Model(False);
 		$incident->incident_dateadd = date("Y-m-d H:i:s",time());
-		$incident->location_id = $location_id;
+		$incident->location_id = $report_location_id;
 		// Check if the user id has been specified
 		if ( ! $incident->loaded AND isset($_SESSION['auth_user']))
 		{
@@ -98,9 +100,47 @@ class S_Nrs_Controller extends Controller {
 
 		// STEP 4: SAVE MEDIA IMMAGINE DEL GRAFICO COLLEGATO A....
 		// reports::save_media($post, $incident);
+		ORM::factory('media')->where('incident_id',$incident->id)->where('media_type <> 1')->delete_all();
+
+		$filename_risklevel = $this->_generate_risklevel_picture($nrs_datastream_id,$updated_timestamp);
+		$this->_save_media($filename_risklevel,$incident,0);
+
+		$filename_overlimits = $this->_generate_overlimits_chart($nrs_datastream_id,$updated_timestamp,$incident->incident_title);
+		$this->_save_media($filename_overlimits,$incident,1);
+
+		$filename_datapoints = $this->_generate_datapoint_chart($nrs_datastream_id,$updated_timestamp);
+		$this->_save_media($filename_datapoints,$incident,2);
 
 
+		// STEP 5: SAVE PERSONAL INFORMATION
+		reports::save_personal_info($nrs_datastream->nrs_environment, $incident);
 
+		// STEP 6: update nrs_datapoint
+		
+		$table_prefix = Kohana::config('database.default.table_prefix');
+		if(isset($whole_node)) 
+		{
+			Database::instance()->query('UPDATE `'.$table_prefix.'nrs_datapoint` SET incident_id = ? WHERE nrs_node_id = ? AND updated = ?', $incident->id, $nrs_datastream->nrs_node_id, $updated_timestamp );
+			// In the case of WHOLE NODE.......we need to manage the incident properly...Description??
+		}
+		else {
+			Database::instance()->query('UPDATE `'.$table_prefix.'nrs_datapoint` SET incident_id = ? WHERE nrs_datastream_id = ? AND updated = ?',	$incident->id, $nrs_datastream->id, $updated_timestamp );
+		}
+	}
+
+
+	private function _generate_risklevel_picture($nrs_datastream_id,$updated_timestamp)
+	{
+		$risk_l_filename = DOCROOT."plugins/nrs/css/img/risk_level-l.png";
+		$risk_m_filename = DOCROOT."plugins/nrs/css/img/risk_level-m.png";
+		$risk_h_filename = DOCROOT."plugins/nrs/css/img/risk_level-h.png";
+		$filename = Kohana::config('upload.directory', TRUE)."risklevel_".$nrs_datastream_id.".png";
+		copy($risk_m_filename,$filename);
+		return $filename;
+	}
+
+	private function _generate_overlimits_chart($nrs_datastream_id,$updated_timestamp,$incident_title)
+	{
 		$databary=$this->_get_bar_array($nrs_datastream_id,$updated_timestamp);
 		// New graph with a drop shadow
 		$graph = new Graph(600,400);
@@ -120,7 +160,7 @@ class S_Nrs_Controller extends Controller {
 		// $graph->SetBackgroundGradient('#0090DF', '#1FC4FF', GRAD_HOR, BGRAD_PLOT);
 
 		// Set title and subtitle
-		$graph->title->Set("NRS Events for Report ". $incident->incident_title );
+		$graph->title->Set("NRS Events for Report ". $incident_title );
 		if( isset($databary) && count($databary) < 20 ) {
 			$graph->xaxis->SetTickLabels($this->_get_label_array($nrs_datastream_id,$updated_timestamp));
 		}
@@ -138,36 +178,82 @@ class S_Nrs_Controller extends Controller {
 		$p1->SetColor('#808000');
 
 		$filename = Kohana::config('upload.directory', TRUE)."overlimits_".$nrs_datastream_id.".png";
-		$i = 1;
 		// Finally output the  image
 		$graph->Stroke($filename);
-
-		$this->_save_media($filename,$incident);
-
-
-		// STEP 5: SAVE PERSONAL INFORMATION
-		reports::save_personal_info($nrs_datastream->nrs_environment, $incident);
-
-		// STEP 6: update nrs_datapoint
-		
-		$table_prefix = Kohana::config('database.default.table_prefix');
-		if(isset($whole_node)) 
-		{
-			Database::instance()->query('UPDATE `'.$table_prefix.'nrs_datapoint` SET incident_id = ? WHERE nrs_node_id = ? AND updated = ?', $incident->id, $nrs_datastream->nrs_node_id, $updated_timestamp );
-			// In the case of WHOLE NODE.......we need to manage the incident properly...Description??
-		}
-		else {
-			Database::instance()->query('UPDATE `'.$table_prefix.'nrs_datapoint` SET incident_id = ? WHERE nrs_datastream_id = ? AND updated = ?',	$incident->id, $nrs_datastream->id, $updated_timestamp );
-		}
+		return $filename;
 	}
-	
-	private function _save_media($filename, $incident)
-	{
-		// Delete Previous Entries
-		ORM::factory('media')->where('incident_id',$incident->id)->where('media_type <> 1')->delete_all();
-		
-		$i = 1;
 
+
+	private function _generate_datapoint_chart($nrs_datastream_id,$updated_timestamp)
+	{
+		$datapoint_array=$this->_get_datapoint_array($nrs_datastream_id,$updated_timestamp);
+
+		// New graph with a drop shadow
+		$graph = new Graph(800,600);
+		// Use a "text" X-scale
+		$graph->SetScale("textlin");
+
+		$theme_class=new UniversalTheme;
+		$graph->SetTheme($theme_class);
+
+		
+		$graph->img->SetAntiAliasing(false);
+		$graph->title->Set('Filled Y-grid');
+		$graph->SetBox(false);
+
+		$graph->img->SetAntiAliasing();
+
+		$graph->yaxis->HideZeroLabel();
+		$graph->yaxis->HideLine(false);
+		$graph->yaxis->HideTicks(false,false);
+
+		$graph->xgrid->Show(false);
+
+		// Set title and subtitle
+		$graph->title->Set($datapoint_array['title'][0] );
+		if( isset($datapoint_array['ticklabel']) && count($datapoint_array['ticklabel']) < 20 ) {
+			$graph->xaxis->SetTickLabels($datapoint_array['ticklabel']);
+		}
+		else
+		{
+			$graph->xaxis->HideLabels();
+		}
+
+
+		$graph->legend->SetFrameWeight(1);
+
+		// Create the line
+		$p1 = new LinePlot($datapoint_array['values']);
+		$graph->Add($p1);
+		$p1->SetColor("#6495ED");
+		$p1->SetLegend($datapoint_array['label'][0]);
+
+		// Create the Average
+		$p2 = new LinePlot($datapoint_array['avg']);
+		$graph->Add($p2);
+		$p2->SetColor("#AF0A0A");
+		$p2->SetLegend('AVG');
+
+		// Create the Min
+		$p3 = new LinePlot($datapoint_array['min']);
+		$graph->Add($p3);
+		$p3->SetColor("#1F7F00");
+		$p3->SetLegend('MIN');
+
+		// Create the MAx
+		$p4 = new LinePlot($datapoint_array['max']);
+		$graph->Add($p4);
+		$p4->SetColor("#C300FF");
+		$p4->SetLegend('MAX');
+
+		$filename = Kohana::config('upload.directory', TRUE)."datapoints_".$nrs_datastream_id.".png";
+		// Finally output the  image
+		$graph->Stroke($filename);
+		return $filename;
+	}
+
+	private function _save_media($filename, $incident,$i=1)
+	{
 		$new_filename = $incident->id.'_'.$i.'_'.time();
 
 		$file_type = strrev(substr(strrev($filename),0,4));
@@ -238,7 +324,45 @@ class S_Nrs_Controller extends Controller {
 		}
 		return $bar_array;
 	}
-
+	
+	private function _get_datapoint_array($nrs_datastream_id,$updated_timestamp)
+	{
+		$datapoint_array = array();
+		$sql_query = " SELECT
+				sample_no,
+				CONVERT( CASE WHEN factor_title IS NULL THEN value_at ELSE constant_value + (value_at - lambda_value)*factor_value END , DECIMAL( 10, 3 ) ) AS value_reported,
+				max_value,
+				min_value,
+				unit_label,
+				unit_symbol,
+				title
+				FROM nrs_datapoint, nrs_datastream
+				WHERE
+				nrs_datapoint.nrs_datastream_id  = nrs_datastream.id AND
+				nrs_datapoint.nrs_datastream_id = ? AND
+				nrs_datapoint.updated = ? ORDER BY datetime_at ASC";
+		$results = Database::instance('default')->query($sql_query, $nrs_datastream_id,$updated_timestamp);
+		$avg = 0;
+		$count = 0;
+		foreach($results as $result)
+		{
+			$datapoint_array['ticklabel'][] = $result->sample_no;
+			$datapoint_array['values'][] = $result->value_reported;
+			$datapoint_array['max'][] = $result->max_value;
+			$datapoint_array['min'][] = $result->min_value;
+			$datapoint_array['avg'][] = 0;
+			$datapoint_array['label'][] = $result->unit_label . "(".$result->unit_symbol.")";
+			$datapoint_array['title'][] = $result->title;
+			$avg += $result->value_reported;
+			$count++;
+		}
+		if($count>0) $avg = $avg/$count;
+		for($i=0;$i<$count;$i++)
+		{
+			$datapoint_array['avg'][$i] = $avg;
+		}		
+		return $datapoint_array;
+	}
 	private function _get_label_array($nrs_datastream_id,$updated_timestamp)
 	{
 		$bar_array = array();
